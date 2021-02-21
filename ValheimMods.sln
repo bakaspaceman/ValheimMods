@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayerMapBlipToggle", "PlayerMapBlipToggle\PlayerMapBlipToggle.csproj", "{62551AF9-6DA8-4040-BE55-5D517749CF24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LastUsedWeapons", "LastUsedWeapons\LastUsedWeapons.csproj", "{840EEFBF-ED22-45A8-9DB3-B7E50D11D3FA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{62551AF9-6DA8-4040-BE55-5D517749CF24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62551AF9-6DA8-4040-BE55-5D517749CF24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62551AF9-6DA8-4040-BE55-5D517749CF24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62551AF9-6DA8-4040-BE55-5D517749CF24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{840EEFBF-ED22-45A8-9DB3-B7E50D11D3FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{840EEFBF-ED22-45A8-9DB3-B7E50D11D3FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{840EEFBF-ED22-45A8-9DB3-B7E50D11D3FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{840EEFBF-ED22-45A8-9DB3-B7E50D11D3FA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E8F666CE-1C07-4D66-9E8D-43CBC94CA263}
+	EndGlobalSection
+EndGlobal
