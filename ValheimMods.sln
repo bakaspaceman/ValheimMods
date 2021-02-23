@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayerMapBlipToggle", "Play
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LastUsedWeapons", "LastUsedWeapons\LastUsedWeapons.csproj", "{840EEFBF-ED22-45A8-9DB3-B7E50D11D3FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterStamina", "BetterStamina\BetterStamina.csproj", "{C78B697C-0617-40B5-B559-88D31B5ED1A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{840EEFBF-ED22-45A8-9DB3-B7E50D11D3FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{840EEFBF-ED22-45A8-9DB3-B7E50D11D3FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{840EEFBF-ED22-45A8-9DB3-B7E50D11D3FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C78B697C-0617-40B5-B559-88D31B5ED1A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C78B697C-0617-40B5-B559-88D31B5ED1A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C78B697C-0617-40B5-B559-88D31B5ED1A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C78B697C-0617-40B5-B559-88D31B5ED1A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

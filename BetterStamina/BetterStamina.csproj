@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{62551AF9-6DA8-4040-BE55-5D517749CF24}</ProjectGuid>
+    <ProjectGuid>{C78B697C-0617-40B5-B559-88D31B5ED1A8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PlayerMapBlipToggle</RootNamespace>
-    <AssemblyName>PlayerMapBlipToggle</AssemblyName>
+    <RootNamespace>BetterStamina</RootNamespace>
+    <AssemblyName>BetterStamina</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -58,18 +57,17 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\_Libs\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\_Libs\UnityEngine.UI.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PlayerMapBlipToggle.cs" />
+    <Compile Include="BetterStamina.cs" />
+    <Compile Include="GeneralStaminaPatches.cs" />
+    <Compile Include="ToolsPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"$(SolutionDir)\..\_Debug Resources\pdb2mdb\pdb2mdb.exe" "$(TargetFileName)"
-xcopy /y "$(TargetPath)" "$(ValheimRoot)\BepInEx\plugins\$(ProjectName)\"
-xcopy /y "$(TargetPath).mdb" "$(ValheimRoot)\BepInEx\plugins\$(ProjectName)\"</PostBuildEvent>
+xcopy /y "$(TargetPath)" "$(ValheimRoot)\BepInEx\scripts\"
+xcopy /y "$(TargetPath).mdb" "$(ValheimRoot)\BepInEx\scripts\"</PostBuildEvent>
   </PropertyGroup>
 </Project>
