@@ -1,6 +1,6 @@
 # Better Stamina
 ## General
-- [ ] Increased stamina regeneration by flat amount.
+- [X] Increased default stamina regeneration.
 - [X] Being encumbered will not drain stamina, slow walking speed is bad enough.
 - [ ] \(Optional) Allow interact with ship steering while encumbered.
 - [ ] \(Optional) Allow walking if at 0 stamina and encumbered.
