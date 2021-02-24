@@ -11,7 +11,8 @@ namespace BetterStamina
     {
         // Config - Debug
         static public ConfigEntry<bool> enableLogging;
-        static public ConfigEntry<bool> enableStaminaLogging;        
+        static public ConfigEntry<bool> enableStaminaLogging;
+        static public ConfigEntry<bool> enableStaminaRegenLogging;
 
         // Config - Stamina
         static public ConfigEntry<bool> enableEncumberedStaminaDrain;
@@ -24,7 +25,10 @@ namespace BetterStamina
 
         // Config - Skills
         static public ConfigEntry<float> dodgeMaxSkillStaminaCost;
+        static public ConfigEntry<float> jumpMaxSkillStaminaCost;
         static public ConfigEntry<float> blockMaxSkillStaminaCost;
+        static public ConfigEntry<float> sneakMaxSkillStaminaCost;
+        static public ConfigEntry<float> weaponMaxSkillAttackStaminaCost;
 
         // Common use private fields
         static public FieldInfo playerSkillsField = typeof(Player).GetField("m_skills", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -46,6 +50,7 @@ namespace BetterStamina
 
             enableLogging = Config.Bind("Debug", "Logging", false, "");
             enableStaminaLogging = Config.Bind("Debug", "StaminaLogging", false, "");
+            enableStaminaRegenLogging = Config.Bind("Debug", "StaminaRegenLogging", false, "");
 
             staminaRegenRateMultiplier = Config.Bind("General", "StaminaRegenRateModifier", 1.3f, "1f = Default rate, 1.5f = 50% faster rate, 0.5f = 50% slower, etc.");
             enableEncumberedStaminaDrain = Config.Bind("General", "EncumberedStaminaDrain", false, "Prevents stamina drain while encumbered.");
@@ -55,7 +60,10 @@ namespace BetterStamina
             enableCultivatorStaminaCost = Config.Bind("Tools", "CultivatorStaminaCost", false, "Using cultivator terrain features will not consume stamina.");
 
             dodgeMaxSkillStaminaCost = Config.Bind("Skills", "MaxDodgeSkillStaminaCost", 0.75f, "0.75f = dodging will cost 25% less when at max Jump skill.");
+            jumpMaxSkillStaminaCost = Config.Bind("Skills", "MaxJumpSkillStaminaCost", 0.75f, "0.75f = jumping will cost 25% less when at max Jump skill.");
             blockMaxSkillStaminaCost = Config.Bind("Skills", "MaxBlockSkillStaminaCost", 0.75f, "0.75f = blocking will cost 25% less when at max Block skill.");
+            sneakMaxSkillStaminaCost = Config.Bind("Skills", "MaxSneakSkillStaminaCost", 0.75f, "0.75f = sneaking will cost 25% less when at max Block skill.");
+            weaponMaxSkillAttackStaminaCost = Config.Bind("Skills", "MaxWeaponSkillAttackStaminaCost", 0.67f, "0.67f = attacking will cost 33% less when at max corresponding Weapon skill.");
 
             DebugLog($"PATCHING");
 

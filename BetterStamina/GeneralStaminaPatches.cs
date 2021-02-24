@@ -66,7 +66,7 @@ internal static class DebugStaminaPatches
         if (__state != staminaRegen && previousStaminaRate != staminaRegen)
         {
             previousStaminaRate = staminaRegen;
-            if (BetterStaminaPlugin.enableStaminaLogging.Value)
+            if (BetterStaminaPlugin.enableStaminaRegenLogging.Value)
             {
                 BetterStaminaPlugin.DebugLog($"ModifyStaminaRegen(): source - {__instance.m_name}; new regen - {staminaRegen}; previous - {__state} multiplier - {__instance.m_staminaRegenMultiplier}");
             }
