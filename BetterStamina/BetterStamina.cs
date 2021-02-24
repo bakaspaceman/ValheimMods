@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using System.Reflection;
 
 namespace BetterStamina
 {
@@ -9,7 +10,7 @@ namespace BetterStamina
     public class BetterStaminaPlugin : BaseUnityPlugin
     {
         // Config - Debug
-        static private ConfigEntry<bool> enableLogging;
+        static public ConfigEntry<bool> enableLogging;
         static public ConfigEntry<bool> enableStaminaLogging;        
 
         // Config - Stamina
@@ -22,7 +23,11 @@ namespace BetterStamina
         static public ConfigEntry<bool> enableHoeStaminaCost;
 
         // Config - Skills
-        static public ConfigEntry<float> dodgeSkillMaxReduction;
+        static public ConfigEntry<float> dodgeMaxSkillStaminaCost;
+        static public ConfigEntry<float> blockMaxSkillStaminaCost;
+
+        // Common use private fields
+        static public FieldInfo playerSkillsField = typeof(Player).GetField("m_skills", BindingFlags.Instance | BindingFlags.NonPublic);
 
         static private Harmony harmonyInst;
         static private new ManualLogSource Logger { get; set; }
@@ -49,7 +54,8 @@ namespace BetterStamina
             enableHoeStaminaCost = Config.Bind("Tools", "HoeStaminaCost", false, "Using hoe terrain features will not consume stamina.");
             enableCultivatorStaminaCost = Config.Bind("Tools", "CultivatorStaminaCost", false, "Using cultivator terrain features will not consume stamina.");
 
-            dodgeSkillMaxReduction = Config.Bind("Skills", "MaxDodgeReduction", 0.5f, "0.5f = dodging will cost half as much when at max Jump skill.");
+            dodgeMaxSkillStaminaCost = Config.Bind("Skills", "MaxDodgeSkillStaminaCost", 0.75f, "0.75f = dodging will cost 25% less when at max Jump skill.");
+            blockMaxSkillStaminaCost = Config.Bind("Skills", "MaxBlockSkillStaminaCost", 0.75f, "0.75f = blocking will cost 25% less when at max Block skill.");
 
             DebugLog($"PATCHING");
 
