@@ -3,6 +3,9 @@ using HarmonyLib;
 using UnityEngine;
 using MathUtils;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using System;
 
 internal static class SkillPatches
 {
@@ -165,5 +168,92 @@ internal static class SkillPatches
 
         // Skip original function
         return false;
+    }
+
+    public static float GetUpdatedHoldBowStaminaDrain(float weaponStaminaDrain, Player playerInst)
+    {
+        if (Player.m_localPlayer != null && (UnityEngine.Object)Player.m_localPlayer == (UnityEngine.Object)playerInst)
+        {
+            EasingFunctions.Function easeFunc = EasingFunctions.GetEasingFunction(EasingFunctions.Ease.EaseOutSine);
+            float interpFactor = easeFunc(1f, BetterStaminaPlugin.bowMaxSkillHoldStaminaCost.Value, playerInst.GetSkillFactor(Skills.SkillType.Bows));
+            float newWeaponStaminaDrain = weaponStaminaDrain * interpFactor;
+
+            if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+                BetterStaminaPlugin.DebugLog($"BowHoldStamina: Usage change: {weaponStaminaDrain} - {newWeaponStaminaDrain}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.bowMaxSkillHoldStaminaCost.Value, playerInst.GetSkillFactor(Skills.SkillType.Blocking))}; Custom: {interpFactor}; skill: {playerInst.GetSkillFactor(Skills.SkillType.Bows)};");
+
+            return newWeaponStaminaDrain;
+        }
+        
+        return weaponStaminaDrain;
+    }
+
+    [HarmonyPatch(typeof(Player), "PlayerAttackInput")]
+    [HarmonyTranspiler]
+    static IEnumerable<CodeInstruction> PlayerAttackInput_Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        BetterStaminaPlugin.DebugLog($"######## PlayerAttackInput_Patch START ########", true);
+        var codes = new List<CodeInstruction>(instructions);
+        for (var i = 0; i < codes.Count; i++)
+        {
+            CodeInstruction instr = codes[i];
+
+            BetterStaminaPlugin.DebugLog($"{i} {instr}", true);
+
+            if (instr.opcode == OpCodes.Callvirt)
+            {
+                String instrString = instr.ToString();
+                if (instrString.Contains("UseStamina"))         // Looking for this line: this.UseStamina(currentWeapon.m_shared.m_holdStaminaDrain * dt);
+                {
+                    int foundCorrectUseStaminaIndex = -1;
+                    for (var j = i - 1; j >= i-5; j--)          // Verify that this UseStamina() call uses m_holdStaminaDrain by checking for it being loaded on the stack within last 5 instructions
+                    {
+                        BetterStaminaPlugin.DebugLog($"^{j} {codes[j].ToString()}", true);
+
+                        if (codes[j].opcode == OpCodes.Ldfld)
+                        {
+                            instrString = codes[j].ToString();
+                            if (instrString.Contains("holdStaminaDrain"))
+                            {
+                                BetterStaminaPlugin.DebugLog($"Found load holdStaminaDrain instruction at {j}:", true);
+                                foundCorrectUseStaminaIndex = j;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (foundCorrectUseStaminaIndex >= 0)
+                    {
+                        int insertIndex = foundCorrectUseStaminaIndex + 1;
+                        BetterStaminaPlugin.DebugLog($"Inserting instruction at {insertIndex}:", true);
+                        BetterStaminaPlugin.DebugLog($"Old: { codes[insertIndex].ToString()}", true);
+                        codes.Insert(insertIndex, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(SkillPatches), "GetUpdatedHoldBowStaminaDrain")));
+                        BetterStaminaPlugin.DebugLog($"New: { codes[insertIndex].ToString()}", true);
+
+                        BetterStaminaPlugin.DebugLog($"Inserting instruction at {insertIndex}:");
+                        BetterStaminaPlugin.DebugLog($"Old: { codes[insertIndex].ToString()}", true);
+                        codes.Insert(insertIndex, new CodeInstruction(OpCodes.Ldarg_0));
+                        BetterStaminaPlugin.DebugLog($"New: { codes[insertIndex].ToString()}", true);
+                        break;
+                    }
+                }
+            }
+        }
+
+        BetterStaminaPlugin.DebugLog($"", true);
+        BetterStaminaPlugin.DebugLog($"#############################################################", true);
+        BetterStaminaPlugin.DebugLog($"######## MODIFIED INSTRUCTIONS - {codes.Count} ########", true);
+        BetterStaminaPlugin.DebugLog($"#############################################################", true);
+        BetterStaminaPlugin.DebugLog($"", true);
+        
+        for (var i = 0; i < codes.Count; i++)
+        {
+            CodeInstruction instr = codes[i];
+        
+            BetterStaminaPlugin.DebugLog($"{i} {instr}", true);
+        }
+        
+        BetterStaminaPlugin.DebugLog($"######## PlayerAttackInput_Patch END ########", true);
+
+        return codes;
     }
 }

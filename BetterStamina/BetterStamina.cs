@@ -14,6 +14,7 @@ namespace BetterStamina
         static public ConfigEntry<bool> enableStaminaLogging;
         static public ConfigEntry<bool> enableStaminaRegenLogging;
         static public ConfigEntry<bool> enableSkillStaminaLogging;
+        static public ConfigEntry<bool> enableTranspilerLogging;
 
         // Config - Stamina
         static public ConfigEntry<bool> enableEncumberedStaminaDrain;
@@ -30,6 +31,7 @@ namespace BetterStamina
         static public ConfigEntry<float> blockMaxSkillStaminaCost;
         static public ConfigEntry<float> sneakMaxSkillStaminaCost;
         static public ConfigEntry<float> weaponMaxSkillAttackStaminaCost;
+        static public ConfigEntry<float> bowMaxSkillHoldStaminaCost;
 
         // Common use private fields
         static public FieldInfo playerSkillsField = typeof(Player).GetField("m_skills", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -37,10 +39,13 @@ namespace BetterStamina
         static private Harmony harmonyInst;
         static private new ManualLogSource Logger { get; set; }
 
-        public static void DebugLog(object message)
+        public static void DebugLog(object message, bool transpilerlogs = false)
         {
             if (enableLogging.Value)
             {
+                if (transpilerlogs && !enableTranspilerLogging.Value)
+                    return;
+
                 Logger.LogInfo(message);
             }
         }
@@ -61,11 +66,13 @@ namespace BetterStamina
             blockMaxSkillStaminaCost = Config.Bind("Skills", "StaminaCostAtMaxBlockSkill", 0.75f, "0.75f = blocking will cost 25% less when at max Block skill.");
             sneakMaxSkillStaminaCost = Config.Bind("Skills", "StaminaCostAtMaxSneakSkill", 0.75f, "0.75f = sneaking will cost 25% less when at max Block skill.");
             weaponMaxSkillAttackStaminaCost = Config.Bind("Skills", "AttackStaminaCostAtMaxWeaponSkill", 0.67f, "0.67f = attacking will cost 33% less when at max corresponding Weapon skill.");
+            bowMaxSkillHoldStaminaCost = Config.Bind("Skills", "HoldBowStaminaCostAtMaxBowSkill", 0.75f, "0.75f = holding the bow drawn will cost 25% less when at max Bow skill.");
 
             enableLogging = Config.Bind("Debug", "Logging", false, "");
             enableStaminaLogging = Config.Bind("Debug", "StaminaLogging", false, "");
             enableStaminaRegenLogging = Config.Bind("Debug", "StaminaRegenLogging", false, "");
             enableSkillStaminaLogging = Config.Bind("Debug", "SkillLogging", false, "");
+            enableTranspilerLogging = Config.Bind("Debug", "TranspilerLogging", false, "");
 
             DebugLog($"PATCHING");
 
