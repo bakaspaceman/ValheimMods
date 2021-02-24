@@ -24,9 +24,9 @@ In addition to current benefits, all skills reduce stamina cost for the correspo
 * Sneak
   - [X] **25%** stamina cost reduction at max level.
 * Weapons
-  - [X] Weapon skills already affect attack stamina cost in vanilla game by **33%** at max level, so this mod only changes it to use EaseOutSine interpolation so the benefits are stronger at the lower end of the skill.
+  - [X] Weapon skills already reduce stamina cost for weapon attacks in vanilla game by **33%** at max level, so this mod only changes it to use EaseOutSine interpolation so the benefits are stronger at the lower end of the skill.
 * Bows
-  - [ ] Reduce stamina cost based on skill for holding the bow drawn
+  - [X] **25%** stamina cost reduction based on skill for holding the bow drawn
 * Swimming
   - [ ] Change the interpolation type for stamina reduction
 * Run
@@ -34,3 +34,4 @@ In addition to current benefits, all skills reduce stamina cost for the correspo
 
 ## Conflicts
 * This mod replaces `Attack.GetStaminaUsage()` function.
+* This mod uses Harmony transpiler patch to edit `Player.PlayerAttackInput()`, specifically this line: `this.UseStamina(currentWeapon.m_shared.m_holdStaminaDrain * dt);`
