@@ -60,6 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BetterStamina.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="SkillPatches.cs" />
     <Compile Include="GeneralStaminaPatches.cs" />
     <Compile Include="ToolsPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -4,11 +4,32 @@ using System.Diagnostics;
 
 internal static class GeneralStaminaPatches
 {
+    private static float defaultEncumberedStaminaDrain = 0f;
+
+    private static void UpdateEncumberedStaminaDrain(Player __instance)
+    {
+        if (!BetterStaminaPlugin.enableEncumberedStaminaDrain.Value)
+        {
+            if (defaultEncumberedStaminaDrain == 0f)
+            {
+                defaultEncumberedStaminaDrain = __instance.m_encumberedStaminaDrain;
+            }
+
+            __instance.m_encumberedStaminaDrain = 0f;
+        }
+        else if (defaultEncumberedStaminaDrain != 0f)
+        {
+            __instance.m_encumberedStaminaDrain = defaultEncumberedStaminaDrain;
+            defaultEncumberedStaminaDrain = 0f;
+        }
+    }
+
     [HarmonyPatch(typeof(Player), "UpdateStats")]
     [HarmonyPrefix]
     private static void UpdateStats_Prefix(Player __instance)
     {
-        __instance.m_encumberedStaminaDrain = 0f;
+        UpdateEncumberedStaminaDrain(__instance);
+
         __instance.m_staminaRegenTimeMultiplier = BetterStaminaPlugin.staminaRegenRateMultiplier.Value;
     }
 }
@@ -25,9 +46,9 @@ internal static class DebugStaminaPatches
     [HarmonyPostfix]
     private static void UseStamina_Postfix(Player __instance, float __state, ref float ___m_stamina)
     {
-        if (BetterStaminaPlugin.enableStaminaLogging.Value)
+        if (BetterStaminaPlugin.enableStaminaLogging.Value && (___m_stamina - __state) != 0f)
         {
-            BetterStaminaPlugin.DebugLog($"UseStamina(): source - {new StackFrame(2).GetMethod().Name}; change - {___m_stamina - __state}; dodgeUsage - {__instance.m_dodgeStaminaUsage}");
+            BetterStaminaPlugin.DebugLog($"UseStamina(): source - {new StackFrame(2).GetMethod().Name}; change - {___m_stamina - __state}");
         }
     }
 
