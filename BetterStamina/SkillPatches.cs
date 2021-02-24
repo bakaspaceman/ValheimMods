@@ -2,6 +2,7 @@
 using HarmonyLib;
 using UnityEngine;
 using MathUtils;
+using System.Diagnostics;
 
 internal static class SkillPatches
 {
@@ -24,7 +25,8 @@ internal static class SkillPatches
 
         __instance.m_sneakStaminaDrain = __instance.m_sneakStaminaDrain * interpFactor;
 
-        //BetterStaminaPlugin.DebugLog($"OnSneaking: Usage change: {defaultSneakStaminaDrain} - {__instance.m_sneakStaminaDrain}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.sneakMaxSkillStaminaCost.Value, ___m_skills.GetSkillFactor(Skills.SkillType.Jump))}; Custom: {interpFactor}; skill: {___m_skills.GetSkillFactor(Skills.SkillType.Jump)};");
+        if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+            BetterStaminaPlugin.DebugLog($"OnSneaking: Usage change: {defaultSneakStaminaDrain} - {__instance.m_sneakStaminaDrain}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.sneakMaxSkillStaminaCost.Value, ___m_skills.GetSkillFactor(Skills.SkillType.Jump))}; Custom: {interpFactor}; skill: {___m_skills.GetSkillFactor(Skills.SkillType.Jump)};");
     }
 
     [HarmonyPatch(typeof(Player), "OnSneaking")]
@@ -51,7 +53,8 @@ internal static class SkillPatches
 
         __instance.m_jumpStaminaUsage = __instance.m_jumpStaminaUsage * interpFactor;
 
-        //BetterStaminaPlugin.DebugLog($"OnJump: Usage change: {defaultJumpStaminaUsage} - {__instance.m_jumpStaminaUsage}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.jumpMaxSkillStaminaCost.Value, ___m_skills.GetSkillFactor(Skills.SkillType.Jump))}; Custom: {interpFactor}; skill: {___m_skills.GetSkillFactor(Skills.SkillType.Jump)};");
+        if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+            BetterStaminaPlugin.DebugLog($"OnJump: Usage change: {defaultJumpStaminaUsage} - {__instance.m_jumpStaminaUsage}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.jumpMaxSkillStaminaCost.Value, ___m_skills.GetSkillFactor(Skills.SkillType.Jump))}; Custom: {interpFactor}; skill: {___m_skills.GetSkillFactor(Skills.SkillType.Jump)};");
     }
 
     [HarmonyPatch(typeof(Player), "OnJump")]
@@ -66,7 +69,7 @@ internal static class SkillPatches
 
     [HarmonyPatch(typeof(Player), "UpdateDodge")]
     [HarmonyPrefix]
-    private static void UpdateDodge_Prefix(Player __instance, Skills ___m_skills)
+    private static void UpdateDodge_Prefix(Player __instance, Skills ___m_skills, float ___m_queuedDodgeTimer)
     {
         defaultStaminaUsage = __instance.m_dodgeStaminaUsage;
 
@@ -78,7 +81,11 @@ internal static class SkillPatches
 
         __instance.m_dodgeStaminaUsage = __instance.m_dodgeStaminaUsage * interpFactor;
 
-        //BetterStaminaPlugin.DebugLog($"UpdateDoge: Usage change: {defaultStaminaUsage} - {__instance.m_dodgeStaminaUsage}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.dodgeMaxSkillStaminaCost.Value, ___m_skills.GetSkillFactor(Skills.SkillType.Jump))}; Custom: {interpFactor}; skill: {___m_skills.GetSkillFactor(Skills.SkillType.Jump)};");
+        if (BetterStaminaPlugin.enableSkillStaminaLogging.Value && 
+            (double)___m_queuedDodgeTimer > 0.0 && __instance.IsOnGround() && (!__instance.IsDead() && !__instance.InAttack()) && (!__instance.IsEncumbered() && !__instance.InDodge()))
+        {
+            BetterStaminaPlugin.DebugLog($"UpdateDoge: Usage change: {defaultStaminaUsage} - {__instance.m_dodgeStaminaUsage}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.dodgeMaxSkillStaminaCost.Value, ___m_skills.GetSkillFactor(Skills.SkillType.Jump))}; Custom: {interpFactor}; skill: {___m_skills.GetSkillFactor(Skills.SkillType.Jump)};");
+        }
     }
 
     [HarmonyPatch(typeof(Player), "UpdateDodge")]
@@ -108,7 +115,8 @@ internal static class SkillPatches
 
             __instance.m_blockStaminaDrain = __instance.m_blockStaminaDrain * interpFactor;
 
-            //BetterStaminaPlugin.DebugLog($"BlockAttack: Usage change: {defaultBlockStaminaDrain} - {__instance.m_blockStaminaDrain}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.blockMaxSkillStaminaCost.Value, playerSkills.GetSkillFactor(Skills.SkillType.Blocking))}; Custom: {interpFactor}; skill: {playerSkills.GetSkillFactor(Skills.SkillType.Blocking)};");
+            if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+                BetterStaminaPlugin.DebugLog($"BlockAttack: Usage change: {defaultBlockStaminaDrain} - {__instance.m_blockStaminaDrain}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.blockMaxSkillStaminaCost.Value, playerSkills.GetSkillFactor(Skills.SkillType.Blocking))}; Custom: {interpFactor}; skill: {playerSkills.GetSkillFactor(Skills.SkillType.Blocking)};");
         }
     }
 
@@ -144,9 +152,16 @@ internal static class SkillPatches
 
         __result = (float)(attackStamina * interpFactor);
 
-        float originalStaminaReduction = (float)(attackStamina * (1f - BetterStaminaPlugin.weaponMaxSkillAttackStaminaCost.Value /*0.330000013113022 */) * (double)___m_character.GetSkillFactor(___m_weapon.m_shared.m_skillType));
-        float originalCalculation = (float)(attackStamina - originalStaminaReduction);
-        BetterStaminaPlugin.DebugLog($"Attack.GetStaminaUsage(): Cost - {__result}; Original: {originalCalculation}; Custom: {__result}; skill: {___m_character.GetSkillFactor(___m_weapon.m_shared.m_skillType)}({___m_weapon.m_shared.m_skillType});");
+        if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+        {
+            string callingMethodName = new StackFrame(2).GetMethod().Name;
+            if (callingMethodName.Contains("Update"))
+            {
+                float originalStaminaReduction = (float)(attackStamina * (1f - BetterStaminaPlugin.weaponMaxSkillAttackStaminaCost.Value /*0.330000013113022 */) * (double)___m_character.GetSkillFactor(___m_weapon.m_shared.m_skillType));
+                float originalCalculation = (float)(attackStamina - originalStaminaReduction);
+                BetterStaminaPlugin.DebugLog($"Attack.GetStaminaUsage(): Cost - {__result}; Original: {originalCalculation}; Custom: {__result}; skill: {___m_character.GetSkillFactor(___m_weapon.m_shared.m_skillType)}({___m_weapon.m_shared.m_skillType});");
+            }
+        }
 
         // Skip original function
         return false;
