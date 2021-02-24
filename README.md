@@ -5,7 +5,8 @@
 - [ ] \(Optional) Allow interact with ship steering while encumbered.
 - [ ] \(Optional) Allow walking if at 0 stamina and encumbered.
 - [X] Building & repairing does not use stamina.
-- [ ] \(Optional) Remove stamina cost for using Cultivator.
+- [X] Remove stamina cost for using Cultivator.
+- [X] Remove stamina cost for using a Hoe.
 - [ ] Investigate **Wet** and **Cold** effects on stamina regeneration.
 
 ## Combat
