@@ -12,12 +12,12 @@ internal static class ToolsPatches
         {
             string name = __instance.GetRightItem().m_shared.m_name;
             string callingMethodName = new StackFrame(2).GetMethod().Name;
-            BetterStaminaPlugin.DebugLog(callingMethodName);
 
             if (callingMethodName.Contains("Repair") || callingMethodName.Contains("UpdatePlacement"))
             {
                 if (name == "$item_hammer" && BetterStaminaPlugin.disableHammerStaminaCost.Value ||
-                    name == "$item_hoe" && BetterStaminaPlugin.disableHoeStaminaCost.Value)
+                    name == "$item_hoe" && BetterStaminaPlugin.disableHoeStaminaCost.Value ||
+                    name == "$item_cultivator" && BetterStaminaPlugin.disableCultivatorStaminaCost.Value)
                 {
                     v = 0.0f;
                 }
