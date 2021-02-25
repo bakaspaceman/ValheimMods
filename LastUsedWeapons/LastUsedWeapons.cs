@@ -61,9 +61,9 @@ namespace LastUsedWeapons
                 return true;
             }
 
-            if (item != null)
+            if (item != null && item.m_shared != null)
             {
-                DebugLog(String.Format("UnequipItem_Prefix: item - {0}, type - {1}", item.m_shared != null ? item.m_shared.m_name : "", item.m_shared != null ? item.m_shared.m_itemType : 0));
+                DebugLog($"UnequipItem_Prefix: item - {item.m_shared.m_name}, type - {item.m_shared.m_itemType}");
             }
 
             bool bResult = CacheCurrentlyEquippedItems(__instance, ref _tempLastRightItem, ref _tempLastLeftItem);
@@ -98,7 +98,7 @@ namespace LastUsedWeapons
                 _lastRightItem = _tempLastRightItem;
                 if (_lastRightItem != null)
                 {
-                    DebugLog(String.Format("UnequipItem_Postfix: last RIGHT set - {0}, type - {1}", _lastRightItem.m_shared.m_name, _lastRightItem.m_shared.m_itemType));
+                    DebugLog($"UnequipItem_Postfix: last RIGHT set - {_lastRightItem.m_shared.m_name}, type - {_lastRightItem.m_shared.m_itemType}");
                 }
                 else
                 {
@@ -121,7 +121,7 @@ namespace LastUsedWeapons
                 _lastLeftItem = _tempLastLeftItem;
                 if (_lastLeftItem != null)
                 {
-                    DebugLog(String.Format("UnequipItem_Postfix: last LEFT set - {0}, type - {1}", _lastLeftItem.m_shared.m_name, _lastLeftItem.m_shared.m_itemType));
+                    DebugLog($"UnequipItem_Postfix: last LEFT set - {_lastLeftItem.m_shared.m_name}, type - {_lastLeftItem.m_shared.m_itemType}");
                 }
                 else
                 {
@@ -211,7 +211,7 @@ namespace LastUsedWeapons
                     DebugLog("ToggleLastEquippedItems: last LEFT set to empty because its a torch.");
                 }
 
-                DebugLog(String.Format("Trying to equip {0}({1}) to right arm", _lastRightItem.m_shared.m_name, _lastRightItem.m_shared.m_itemType));
+                DebugLog($"Trying to equip {_lastRightItem.m_shared.m_name}({_lastRightItem.m_shared.m_itemType}) to right arm");
 
                 bool bNewItemIsTool = _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool;
                 equippedRightItem = (bool)_toggleEquipedMethod.Invoke(Player.m_localPlayer, new object[] { _lastRightItem });
@@ -223,7 +223,7 @@ namespace LastUsedWeapons
 
                         if (_lastRightItem != null)
                         {
-                            DebugLog(String.Format("ToggleLastEquippedItems: last RIGHT set - {0}, type - {1}", _lastRightItem.m_shared.m_name, _lastRightItem.m_shared.m_itemType));
+                            DebugLog($"ToggleLastEquippedItems: last RIGHT set - {_lastRightItem.m_shared.m_name}, type - {_lastRightItem.m_shared.m_itemType}");
                         }
                         else
                         {
@@ -240,7 +240,7 @@ namespace LastUsedWeapons
 
             if (_lastLeftItem != null)
             {
-                DebugLog(String.Format("Trying to equip {0}({1}) to left arm", _lastLeftItem.m_shared.m_name, _lastLeftItem.m_shared.m_itemType));
+                DebugLog($"Trying to equip {_lastLeftItem.m_shared.m_name}({_lastLeftItem.m_shared.m_itemType}) to left arm");
 
                 bool bNewItemIsTool = _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool;
                 if (equippedRightItem)
@@ -262,7 +262,7 @@ namespace LastUsedWeapons
 
                         if (_lastLeftItem != null)
                         {
-                            DebugLog(String.Format("ToggleLastEquippedItems: last LEFT set - {0}, type - {1}", _lastLeftItem.m_shared.m_name, _lastLeftItem.m_shared.m_itemType));
+                            DebugLog($"ToggleLastEquippedItems: last LEFT set - {_lastLeftItem.m_shared.m_name}, type - {_lastLeftItem.m_shared.m_itemType}");
                         }
                         else
                         {
@@ -297,18 +297,18 @@ namespace LastUsedWeapons
             if (_rightItem != null)
             {
                 lastRightItem = (ItemDrop.ItemData)_rightItem.GetValue(__instance);
-                if (lastRightItem != null)
+                if (lastRightItem != null && lastRightItem.m_shared != null)
                 {
-                    DebugLog(String.Format("Caching currently equipped RIGHT item - {0}, type - {1}", lastRightItem.m_shared != null ? lastRightItem.m_shared.m_name : "", lastRightItem.m_shared != null ? lastRightItem.m_shared.m_itemType : 0));
+                    DebugLog($"Caching currently equipped RIGHT item - {lastRightItem.m_shared.m_name}, type - {lastRightItem.m_shared.m_itemType}");
                 }
             }
 
             if (_leftItem != null)
             {
                 lastLeftItem = (ItemDrop.ItemData)_leftItem.GetValue(__instance);
-                if (lastLeftItem != null)
+                if (lastLeftItem != null && lastLeftItem.m_shared != null)
                 {
-                    DebugLog(String.Format("Caching currently equipped LEFT item - {0}, type - {1}", lastLeftItem.m_shared != null ? lastLeftItem.m_shared.m_name : "", lastLeftItem.m_shared != null ? lastLeftItem.m_shared.m_itemType : 0));
+                    DebugLog($"Caching currently equipped LEFT item - {lastLeftItem.m_shared.m_name}, type - {lastLeftItem.m_shared.m_itemType}");
                 }
             }
 
