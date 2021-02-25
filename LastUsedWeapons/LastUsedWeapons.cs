@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using HarmonyLib;
 using System;
 using System.Reflection;
@@ -8,10 +9,11 @@ using UnityEngine;
 namespace LastUsedWeapons
 {
     [BepInPlugin("bakaSpaceman.LastUsedWeapons", "Last Used Weapons", "1.0.0.0")]
-    public class LastUsedWeapons : BaseUnityPlugin
+    public class LastUsedWeapons : BepInPluginTempalte
     {
+        // Config - General
         private ConfigEntry<KeyboardShortcut> toggleLastEquippedShortcut;
-        static private ConfigEntry<bool> ignoreTools;
+        static public ConfigEntry<bool> ignoreTools;
 
         static MethodInfo _toggleEquipedMethod = typeof(Humanoid).GetMethod("ToggleEquiped", BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -27,12 +29,19 @@ namespace LastUsedWeapons
 
         static bool _cacheLastitems = true;
 
-        void Awake()
+        private void SetupConfig()
         {
-            Harmony.CreateAndPatchAll(typeof(LastUsedWeapons));
-
             toggleLastEquippedShortcut = Config.Bind("Key Bindings", "ToggleRecentWeapons", new KeyboardShortcut(KeyCode.Y), "Equips previous set of weapons");
             ignoreTools = Config.Bind("General", "IgnoreTools", false, "Will not remember tools as being last equipped (will preserve weapons held before them)");
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            SetupConfig();
+
+            harmonyInst.PatchAll(typeof(LastUsedWeapons));
         }
 
         void Update()
@@ -54,7 +63,7 @@ namespace LastUsedWeapons
 
             if (item != null)
             {
-                UnityEngine.Debug.Log(String.Format("UnequipItem_Prefix: item - {0}, type - {1}", item.m_shared != null ? item.m_shared.m_name : "", item.m_shared != null ? item.m_shared.m_itemType : 0));
+                DebugLog(String.Format("UnequipItem_Prefix: item - {0}, type - {1}", item.m_shared != null ? item.m_shared.m_name : "", item.m_shared != null ? item.m_shared.m_itemType : 0));
             }
 
             bool bResult = CacheCurrentlyEquippedItems(__instance, ref _tempLastRightItem, ref _tempLastLeftItem);
@@ -68,13 +77,13 @@ namespace LastUsedWeapons
         {
             if (!_cacheLastitems)
             {
-                //UnityEngine.Debug.Log("_cacheLastitems is false! early out");
+                //DebugLog("_cacheLastitems is false! early out");
                 return;
             }
 
             if (ignoreTools.Value && item != null && item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool)
             {
-                UnityEngine.Debug.Log("Ignoring tools due to config option!");
+                DebugLog("Ignoring tools due to config option!");
                 return;
             }
 
@@ -89,11 +98,11 @@ namespace LastUsedWeapons
                 _lastRightItem = _tempLastRightItem;
                 if (_lastRightItem != null)
                 {
-                    UnityEngine.Debug.Log(String.Format("UnequipItem_Postfix: last RIGHT set - {0}, type - {1}", _lastRightItem.m_shared.m_name, _lastRightItem.m_shared.m_itemType));
+                    DebugLog(String.Format("UnequipItem_Postfix: last RIGHT set - {0}, type - {1}", _lastRightItem.m_shared.m_name, _lastRightItem.m_shared.m_itemType));
                 }
                 else
                 {
-                    UnityEngine.Debug.Log("UnequipItem_Postfix: las RIGHT set to empty.");
+                    DebugLog("UnequipItem_Postfix: las RIGHT set to empty.");
                 }
 
                 if (_lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.TwoHandedWeapon ||
@@ -101,7 +110,7 @@ namespace LastUsedWeapons
                     _lastLeftItem != null && _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Bow)
                 {
                     _lastLeftItem = null;
-                    UnityEngine.Debug.Log("UnequipItem_Postfix: last LEFT set to empty.");
+                    DebugLog("UnequipItem_Postfix: last LEFT set to empty.");
                 }
 
                 bDidWork = true;
@@ -112,18 +121,18 @@ namespace LastUsedWeapons
                 _lastLeftItem = _tempLastLeftItem;
                 if (_lastLeftItem != null)
                 {
-                    UnityEngine.Debug.Log(String.Format("UnequipItem_Postfix: last LEFT set - {0}, type - {1}", _lastLeftItem.m_shared.m_name, _lastLeftItem.m_shared.m_itemType));
+                    DebugLog(String.Format("UnequipItem_Postfix: last LEFT set - {0}, type - {1}", _lastLeftItem.m_shared.m_name, _lastLeftItem.m_shared.m_itemType));
                 }
                 else
                 {
-                    UnityEngine.Debug.Log("UnequipItem_Postfix: last LEFT set to empty.");
+                    DebugLog("UnequipItem_Postfix: last LEFT set to empty.");
                 }
 
                 if (_lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Bow ||
                     _lastRightItem != null && (_lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.TwoHandedWeapon || _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool))
                 {
                     _lastRightItem = null;
-                    UnityEngine.Debug.Log("UnequipItem_Postfix: last RIGHT set to empty.");
+                    DebugLog("UnequipItem_Postfix: last RIGHT set to empty.");
                 }
 
                 bDidWork = true;
@@ -134,7 +143,7 @@ namespace LastUsedWeapons
 
             if (bDidWork)
             {
-                UnityEngine.Debug.Log("");
+                DebugLog("");
             }
         }
 
@@ -171,18 +180,18 @@ namespace LastUsedWeapons
             {
                 if (!Player.m_localPlayer.IsSwiming() || Player.m_localPlayer.IsOnGround())
                 {
-                    UnityEngine.Debug.Log("");
-                    UnityEngine.Debug.Log("--- [Toggle Last Equipped] START ---");
+                    DebugLog("");
+                    DebugLog("--- [Toggle Last Equipped] START ---");
                     Player.m_localPlayer.ShowHandItems();
-                    UnityEngine.Debug.Log("ShowHandItems() instead");
-                    UnityEngine.Debug.Log("");
+                    DebugLog("ShowHandItems() instead");
+                    DebugLog("");
                 }
 
                 return;
             }
 
-            UnityEngine.Debug.Log("");
-            UnityEngine.Debug.Log("--- [Toggle Last Equipped] START ---");
+            DebugLog("");
+            DebugLog("--- [Toggle Last Equipped] START ---");
 
             _cacheLastitems = false;
             ItemDrop.ItemData tempLastRightItem = null;
@@ -199,10 +208,10 @@ namespace LastUsedWeapons
                 if (_lastLeftItem != null && _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Torch)
                 {
                     _lastLeftItem = null;
-                    UnityEngine.Debug.Log("ToggleLastEquippedItems: last LEFT set to empty because its a torch.");
+                    DebugLog("ToggleLastEquippedItems: last LEFT set to empty because its a torch.");
                 }
 
-                UnityEngine.Debug.Log(String.Format("Trying to equip {0}({1}) to right arm", _lastRightItem.m_shared.m_name, _lastRightItem.m_shared.m_itemType));
+                DebugLog(String.Format("Trying to equip {0}({1}) to right arm", _lastRightItem.m_shared.m_name, _lastRightItem.m_shared.m_itemType));
 
                 bool bNewItemIsTool = _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool;
                 equippedRightItem = (bool)_toggleEquipedMethod.Invoke(Player.m_localPlayer, new object[] { _lastRightItem });
@@ -214,24 +223,24 @@ namespace LastUsedWeapons
 
                         if (_lastRightItem != null)
                         {
-                            UnityEngine.Debug.Log(String.Format("ToggleLastEquippedItems: last RIGHT set - {0}, type - {1}", _lastRightItem.m_shared.m_name, _lastRightItem.m_shared.m_itemType));
+                            DebugLog(String.Format("ToggleLastEquippedItems: last RIGHT set - {0}, type - {1}", _lastRightItem.m_shared.m_name, _lastRightItem.m_shared.m_itemType));
                         }
                         else
                         {
-                            UnityEngine.Debug.Log("ToggleLastEquippedItems: last RIGHT set to empty.");
+                            DebugLog("ToggleLastEquippedItems: last RIGHT set to empty.");
                         }
                     }
                     else if (ignoreTools.Value && !bNewItemIsTool)
                     {
                         _lastRightItem = null;
-                        UnityEngine.Debug.Log("ToggleLastEquippedItems: last RIGHT set to empty.");
+                        DebugLog("ToggleLastEquippedItems: last RIGHT set to empty.");
                     }
                 }
             }
 
             if (_lastLeftItem != null)
             {
-                UnityEngine.Debug.Log(String.Format("Trying to equip {0}({1}) to left arm", _lastLeftItem.m_shared.m_name, _lastLeftItem.m_shared.m_itemType));
+                DebugLog(String.Format("Trying to equip {0}({1}) to left arm", _lastLeftItem.m_shared.m_name, _lastLeftItem.m_shared.m_itemType));
 
                 bool bNewItemIsTool = _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool;
                 if (equippedRightItem)
@@ -245,7 +254,7 @@ namespace LastUsedWeapons
 
                 if (equippedLeftItem)
                 {
-                    UnityEngine.Debug.Log("Successful");
+                    DebugLog("Successful");
 
                     if (!ignoreTools.Value || tempLastLeftItem == null || tempLastLeftItem.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Tool)
                     {
@@ -253,17 +262,17 @@ namespace LastUsedWeapons
 
                         if (_lastLeftItem != null)
                         {
-                            UnityEngine.Debug.Log(String.Format("ToggleLastEquippedItems: last LEFT set - {0}, type - {1}", _lastLeftItem.m_shared.m_name, _lastLeftItem.m_shared.m_itemType));
+                            DebugLog(String.Format("ToggleLastEquippedItems: last LEFT set - {0}, type - {1}", _lastLeftItem.m_shared.m_name, _lastLeftItem.m_shared.m_itemType));
                         }
                         else
                         {
-                            UnityEngine.Debug.Log("ToggleLastEquippedItems: last LEFT set to empty.");
+                            DebugLog("ToggleLastEquippedItems: last LEFT set to empty.");
                         }
                     }
                     else if (ignoreTools.Value && !bNewItemIsTool)
                     {
                         _lastLeftItem = null;
-                        UnityEngine.Debug.Log("ToggleLastEquippedItems: last LEFT set to empty.");
+                        DebugLog("ToggleLastEquippedItems: last LEFT set to empty.");
                     }
                 }
             }
@@ -274,8 +283,8 @@ namespace LastUsedWeapons
 
             _cacheLastitems = true;
 
-            UnityEngine.Debug.Log("--- [Toggle Last Equipped] END ---");
-            UnityEngine.Debug.Log("");
+            DebugLog("--- [Toggle Last Equipped] END ---");
+            DebugLog("");
         }
 
         private static bool CacheCurrentlyEquippedItems(Humanoid __instance, ref ItemDrop.ItemData lastRightItem, ref ItemDrop.ItemData lastLeftItem)
@@ -290,7 +299,7 @@ namespace LastUsedWeapons
                 lastRightItem = (ItemDrop.ItemData)_rightItem.GetValue(__instance);
                 if (lastRightItem != null)
                 {
-                    UnityEngine.Debug.Log(String.Format("Caching currently equipped RIGHT item - {0}, type - {1}", lastRightItem.m_shared != null ? lastRightItem.m_shared.m_name : "", lastRightItem.m_shared != null ? lastRightItem.m_shared.m_itemType : 0));
+                    DebugLog(String.Format("Caching currently equipped RIGHT item - {0}, type - {1}", lastRightItem.m_shared != null ? lastRightItem.m_shared.m_name : "", lastRightItem.m_shared != null ? lastRightItem.m_shared.m_itemType : 0));
                 }
             }
 
@@ -299,7 +308,7 @@ namespace LastUsedWeapons
                 lastLeftItem = (ItemDrop.ItemData)_leftItem.GetValue(__instance);
                 if (lastLeftItem != null)
                 {
-                    UnityEngine.Debug.Log(String.Format("Caching currently equipped LEFT item - {0}, type - {1}", lastLeftItem.m_shared != null ? lastLeftItem.m_shared.m_name : "", lastLeftItem.m_shared != null ? lastLeftItem.m_shared.m_itemType : 0));
+                    DebugLog(String.Format("Caching currently equipped LEFT item - {0}, type - {1}", lastLeftItem.m_shared != null ? lastLeftItem.m_shared.m_name : "", lastLeftItem.m_shared != null ? lastLeftItem.m_shared.m_itemType : 0));
                 }
             }
 

@@ -7,14 +7,12 @@ using System.Reflection;
 namespace BetterStamina
 {
     [BepInPlugin("bakaSpaceman.BetterStamina", "Better Stamina", "1.0.0.0")]
-    public class BetterStaminaPlugin : BaseUnityPlugin
+    public class BetterStaminaPlugin : BepInPluginTempalte
     {
         // Config - Debug
-        static public ConfigEntry<bool> enableLogging;
         static public ConfigEntry<bool> enableStaminaLogging;
         static public ConfigEntry<bool> enableStaminaRegenLogging;
         static public ConfigEntry<bool> enableSkillStaminaLogging;
-        static public ConfigEntry<bool> enableTranspilerLogging;
 
         // Config - Stamina
         static public ConfigEntry<bool> enableEncumberedStaminaDrain;
@@ -38,29 +36,8 @@ namespace BetterStamina
         // Common use private fields
         static public FieldInfo playerSkillsField = typeof(Player).GetField("m_skills", BindingFlags.Instance | BindingFlags.NonPublic);
 
-        static private Harmony harmonyInst;
-        static private new ManualLogSource Logger { get; set; }
-
-        public static void DebugTranspilerLog(object message)
+        private void SetupConfig()
         {
-            DebugLog(message, true);
-        }
-
-        public static void DebugLog(object message, bool transpilerlogs = false)
-        {
-            if (enableLogging.Value)
-            {
-                if (transpilerlogs && !enableTranspilerLogging.Value)
-                    return;
-
-                Logger.LogInfo(message);
-            }
-        }
-
-        void Awake()
-        {
-            Logger = BepInEx.Logging.Logger.CreateLogSource("BetterStamina");
-
             staminaRegenRateMultiplier = Config.Bind("General", "StaminaRegenRateModifier", 1.2f, "1f = Default rate, 1.5f = 50% faster rate, 0.5f = 50% slower, etc.");
             enableEncumberedStaminaDrain = Config.Bind("General", "EncumberedStaminaDrain", false, "Prevents stamina drain while encumbered.");
 
@@ -82,10 +59,14 @@ namespace BetterStamina
             enableStaminaRegenLogging = Config.Bind("Debug", "StaminaRegenLogging", false, "");
             enableSkillStaminaLogging = Config.Bind("Debug", "SkillLogging", false, "");
             enableTranspilerLogging = Config.Bind("Debug", "TranspilerLogging", false, "");
+        }
 
-            DebugLog($"PATCHING");
+        protected override void Awake()
+        {
+            base.Awake();
 
-            harmonyInst = new Harmony("bakaSpaceman.BetterStamina");
+            SetupConfig();
+
             if (enableLogging.Value)
             {
                 harmonyInst.PatchAll(typeof(DebugStaminaPatches));
@@ -93,15 +74,6 @@ namespace BetterStamina
             harmonyInst.PatchAll(typeof(GeneralStaminaPatches));
             harmonyInst.PatchAll(typeof(ToolsPatches));
             harmonyInst.PatchAll(typeof(SkillPatches));
-
-            
-        }
-
-        void OnDestroy()
-        {
-            DebugLog($"UNPATCHING");
-            harmonyInst.UnpatchSelf();
-            BepInEx.Logging.Logger.Sources.Remove(Logger);
         }
     }
 }

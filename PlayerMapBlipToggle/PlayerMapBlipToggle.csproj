@@ -68,8 +68,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir)\..\_Debug Resources\pdb2mdb\pdb2mdb.exe" "$(TargetFileName)"
-xcopy /y "$(TargetPath)" "$(ValheimRoot)\BepInEx\plugins\$(ProjectName)\"
-xcopy /y "$(TargetPath).mdb" "$(ValheimRoot)\BepInEx\plugins\$(ProjectName)\"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

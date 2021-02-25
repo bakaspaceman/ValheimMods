@@ -15,6 +15,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "UnityUtils", "UnityUtils\Un
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		UnityUtils\UnityUtils.projitems*{840eefbf-ed22-45a8-9db3-b7e50d11d3fa}*SharedItemsImports = 4
 		UnityUtils\UnityUtils.projitems*{c78b697c-0617-40b5-b559-88d31b5ed1a8}*SharedItemsImports = 4
 		UnityUtils\UnityUtils.projitems*{e4ec132f-1a8d-45b3-bf09-78144ff68bca}*SharedItemsImports = 13
 	EndGlobalSection
