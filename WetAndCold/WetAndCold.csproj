@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C78B697C-0617-40B5-B559-88D31B5ED1A8}</ProjectGuid>
+    <ProjectGuid>{71E1016A-9C8B-4494-9A25-554145562E44}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BetterStamina</RootNamespace>
-    <AssemblyName>BetterStamina</AssemblyName>
+    <RootNamespace>WetAndCold</RootNamespace>
+    <AssemblyName>WetAndCold</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -33,6 +33,10 @@
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\_Libs\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="assembly_guiutils, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\_Libs\assembly_guiutils.dll</HintPath>
     </Reference>
     <Reference Include="assembly_valheim">
       <HintPath>..\..\_Libs\assembly_valheim.dll</HintPath>
@@ -59,13 +63,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BetterStamina.cs" />
-    <Compile Include="SkillPatches.cs" />
-    <Compile Include="GeneralStaminaPatches.cs" />
-    <Compile Include="ToolsPatches.cs" />
+    <Compile Include="WetAndCold.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <Import Project="..\UnityUtils\UnityUtils.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"$(SolutionDir)\..\_Debug Resources\pdb2mdb\pdb2mdb.exe" "$(TargetFileName)"

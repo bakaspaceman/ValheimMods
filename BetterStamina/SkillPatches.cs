@@ -191,13 +191,13 @@ internal static class SkillPatches
     [HarmonyTranspiler]
     static IEnumerable<CodeInstruction> PlayerAttackInput_Transpiler(IEnumerable<CodeInstruction> instructions)
     {
-        BetterStaminaPlugin.DebugLog($"######## PlayerAttackInput_Patch START ########", true);
+        BetterStaminaPlugin.DebugTranspilerLog($"######## PlayerAttackInput_Patch START ########");
         var codes = new List<CodeInstruction>(instructions);
         for (var i = 0; i < codes.Count; i++)
         {
             CodeInstruction instr = codes[i];
 
-            BetterStaminaPlugin.DebugLog($"{i} {instr}", true);
+            BetterStaminaPlugin.DebugTranspilerLog($"{i} {instr}");
 
             if (instr.opcode == OpCodes.Callvirt)
             {
@@ -207,14 +207,14 @@ internal static class SkillPatches
                     int foundCorrectUseStaminaIndex = -1;
                     for (var j = i - 1; j >= i-5; j--)          // Verify that this UseStamina() call uses m_holdStaminaDrain by checking for it being loaded on the stack within last 5 instructions
                     {
-                        BetterStaminaPlugin.DebugLog($"^{j} {codes[j].ToString()}", true);
+                        BetterStaminaPlugin.DebugTranspilerLog($"^{j} {codes[j].ToString()}");
 
                         if (codes[j].opcode == OpCodes.Ldfld)
                         {
                             instrString = codes[j].ToString();
                             if (instrString.Contains("holdStaminaDrain"))
                             {
-                                BetterStaminaPlugin.DebugLog($"Found load holdStaminaDrain instruction at {j}:", true);
+                                BetterStaminaPlugin.DebugTranspilerLog($"Found load holdStaminaDrain instruction at {j}:");
                                 foundCorrectUseStaminaIndex = j;
                                 break;
                             }
@@ -224,35 +224,35 @@ internal static class SkillPatches
                     if (foundCorrectUseStaminaIndex >= 0)
                     {
                         int insertIndex = foundCorrectUseStaminaIndex + 1;
-                        BetterStaminaPlugin.DebugLog($"Inserting instruction at {insertIndex}:", true);
-                        BetterStaminaPlugin.DebugLog($"Old: { codes[insertIndex].ToString()}", true);
+                        BetterStaminaPlugin.DebugTranspilerLog($"Inserting instruction at {insertIndex}:");
+                        BetterStaminaPlugin.DebugTranspilerLog($"Old: { codes[insertIndex].ToString()}");
                         codes.Insert(insertIndex, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(SkillPatches), "GetUpdatedHoldBowStaminaDrain")));
-                        BetterStaminaPlugin.DebugLog($"New: { codes[insertIndex].ToString()}", true);
+                        BetterStaminaPlugin.DebugTranspilerLog($"New: { codes[insertIndex].ToString()}");
 
-                        BetterStaminaPlugin.DebugLog($"Inserting instruction at {insertIndex}:");
-                        BetterStaminaPlugin.DebugLog($"Old: { codes[insertIndex].ToString()}", true);
+                        BetterStaminaPlugin.DebugTranspilerLog($"Inserting instruction at {insertIndex}:");
+                        BetterStaminaPlugin.DebugTranspilerLog($"Old: { codes[insertIndex].ToString()}");
                         codes.Insert(insertIndex, new CodeInstruction(OpCodes.Ldarg_0));
-                        BetterStaminaPlugin.DebugLog($"New: { codes[insertIndex].ToString()}", true);
+                        BetterStaminaPlugin.DebugTranspilerLog($"New: { codes[insertIndex].ToString()}");
                         break;
                     }
                 }
             }
         }
 
-        BetterStaminaPlugin.DebugLog($"", true);
-        BetterStaminaPlugin.DebugLog($"#############################################################", true);
-        BetterStaminaPlugin.DebugLog($"######## MODIFIED INSTRUCTIONS - {codes.Count} ########", true);
-        BetterStaminaPlugin.DebugLog($"#############################################################", true);
-        BetterStaminaPlugin.DebugLog($"", true);
+        BetterStaminaPlugin.DebugTranspilerLog($"");
+        BetterStaminaPlugin.DebugTranspilerLog($"#############################################################");
+        BetterStaminaPlugin.DebugTranspilerLog($"######## MODIFIED INSTRUCTIONS - {codes.Count} ########");
+        BetterStaminaPlugin.DebugTranspilerLog($"#############################################################");
+        BetterStaminaPlugin.DebugTranspilerLog($"");
         
         for (var i = 0; i < codes.Count; i++)
         {
             CodeInstruction instr = codes[i];
         
-            BetterStaminaPlugin.DebugLog($"{i} {instr}", true);
+            BetterStaminaPlugin.DebugTranspilerLog($"{i} {instr}");
         }
         
-        BetterStaminaPlugin.DebugLog($"######## PlayerAttackInput_Patch END ########", true);
+        BetterStaminaPlugin.DebugTranspilerLog($"######## PlayerAttackInput_Patch END ########");
 
         return codes;
     }
