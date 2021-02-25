@@ -32,6 +32,8 @@ namespace BetterStamina
         static public ConfigEntry<float> sneakMaxSkillStaminaCost;
         static public ConfigEntry<float> weaponMaxSkillAttackStaminaCost;
         static public ConfigEntry<float> bowMaxSkillHoldStaminaCost;
+        static public ConfigEntry<float> swimMaxStaminaCost;
+        static public ConfigEntry<float> swimMinStaminaCost;
 
         // Common use private fields
         static public FieldInfo playerSkillsField = typeof(Player).GetField("m_skills", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -72,6 +74,8 @@ namespace BetterStamina
             sneakMaxSkillStaminaCost = Config.Bind("Skills", "StaminaCostAtMaxSneakSkill", 0.67f, "0.75f = sneaking will cost 25% less when at max Block skill.");
             weaponMaxSkillAttackStaminaCost = Config.Bind("Skills", "AttackStaminaCostAtMaxWeaponSkill", 0.67f, "0.67f = attacking will cost 33% less when at max corresponding Weapon skill.");
             bowMaxSkillHoldStaminaCost = Config.Bind("Skills", "HoldBowStaminaCostAtMaxBowSkill", 0.67f, "0.75f = holding the bow drawn will cost 25% less when at max Bow skill.");
+            swimMaxStaminaCost = Config.Bind("Skills", "SwimStaminaCostAtMinSwimSkill", 6f, "swimming stamina cost at min Swim skill.");
+            swimMinStaminaCost = Config.Bind("Skills", "SwimStaminaCostAtMaxSwimSkill", 3f, "swimming stamina cost at max Swim skill.");
 
             enableLogging = Config.Bind("Debug", "Logging", false, "");
             enableStaminaLogging = Config.Bind("Debug", "StaminaLogging", false, "");

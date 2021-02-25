@@ -214,7 +214,7 @@ internal static class SkillPatches
                             instrString = codes[j].ToString();
                             if (instrString.Contains("holdStaminaDrain"))
                             {
-                                BetterStaminaPlugin.DebugTranspilerLog($"Found load holdStaminaDrain instruction at {j}:");
+                                BetterStaminaPlugin.DebugTranspilerLog($">>> Found load holdStaminaDrain instruction at {j}:");
                                 foundCorrectUseStaminaIndex = j;
                                 break;
                             }
@@ -224,12 +224,12 @@ internal static class SkillPatches
                     if (foundCorrectUseStaminaIndex >= 0)
                     {
                         int insertIndex = foundCorrectUseStaminaIndex + 1;
-                        BetterStaminaPlugin.DebugTranspilerLog($"Inserting instruction at {insertIndex}:");
+                        BetterStaminaPlugin.DebugTranspilerLog($">>> Inserting instruction at {insertIndex}:");
                         BetterStaminaPlugin.DebugTranspilerLog($"Old: { codes[insertIndex].ToString()}");
                         codes.Insert(insertIndex, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(SkillPatches), "GetUpdatedHoldBowStaminaDrain")));
                         BetterStaminaPlugin.DebugTranspilerLog($"New: { codes[insertIndex].ToString()}");
 
-                        BetterStaminaPlugin.DebugTranspilerLog($"Inserting instruction at {insertIndex}:");
+                        BetterStaminaPlugin.DebugTranspilerLog($">>> Inserting instruction at {insertIndex}:");
                         BetterStaminaPlugin.DebugTranspilerLog($"Old: { codes[insertIndex].ToString()}");
                         codes.Insert(insertIndex, new CodeInstruction(OpCodes.Ldarg_0));
                         BetterStaminaPlugin.DebugTranspilerLog($"New: { codes[insertIndex].ToString()}");
@@ -253,6 +253,147 @@ internal static class SkillPatches
         }
         
         BetterStaminaPlugin.DebugTranspilerLog($"######## PlayerAttackInput_Patch END ########");
+        BetterStaminaPlugin.DebugTranspilerLog($"");
+
+        return codes;
+    }
+
+    public static float GetRunStaminaSkillFactor(float drainMax, float drainMin, float skillFactor, Player playerInst)
+    {
+        if (Player.m_localPlayer != null && (UnityEngine.Object)Player.m_localPlayer == (UnityEngine.Object)playerInst)
+        {
+            EasingFunctions.Function easeFunc = EasingFunctions.GetEasingFunction(EasingFunctions.Ease.EaseOutSine);
+            float interpFactor = easeFunc(drainMax, drainMin, skillFactor);
+            
+            if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+                BetterStaminaPlugin.DebugLog($"RunStamina: Skill factor change: {Mathf.Lerp(1f, 0.5f, skillFactor)} - {interpFactor}");
+
+            return interpFactor;
+        }
+
+        return Mathf.Lerp(drainMax, drainMin, skillFactor);
+    }
+
+    [HarmonyPatch(typeof(Player), "CheckRun")]
+    [HarmonyTranspiler]
+    static IEnumerable<CodeInstruction> CheckRun_Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        BetterStaminaPlugin.DebugTranspilerLog($"######## CheckRun_Transpiler START ########");
+        var codes = new List<CodeInstruction>(instructions);
+        for (var i = 0; i < codes.Count; i++)
+        {
+            CodeInstruction instr = codes[i];
+
+            BetterStaminaPlugin.DebugTranspilerLog($"{i} {instr}");
+
+            if (instr.opcode == OpCodes.Call)
+            {
+                String instrString = instr.ToString();
+                if (instrString.Contains("Mathf::Lerp"))         // Looking for this line: float drain = this.m_runStaminaDrain * Mathf.Lerp(1f, 0.5f, this.m_skills.GetSkillFactor(Skills.SkillType.Run));
+                {
+                    int insertIndex = i;
+                    BetterStaminaPlugin.DebugTranspilerLog($">>> Deleting instruction {insertIndex} {codes[insertIndex].ToString()}:");
+                    codes.RemoveAt(i);
+
+                    BetterStaminaPlugin.DebugTranspilerLog($">>> Inserting instruction at {insertIndex}:");
+                    BetterStaminaPlugin.DebugTranspilerLog($"Old: { codes[insertIndex].ToString()}");
+                    codes.Insert(insertIndex, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(SkillPatches), "GetRunStaminaSkillFactor")));
+                    BetterStaminaPlugin.DebugTranspilerLog($"New: { codes[insertIndex].ToString()}");
+
+                    BetterStaminaPlugin.DebugTranspilerLog($">>> Inserting instruction at {insertIndex}:");
+                    BetterStaminaPlugin.DebugTranspilerLog($"Old: { codes[insertIndex].ToString()}");
+                    codes.Insert(insertIndex, new CodeInstruction(OpCodes.Ldarg_0));
+                    BetterStaminaPlugin.DebugTranspilerLog($"New: { codes[insertIndex].ToString()}");
+                    break;
+                }
+            }
+        }
+
+        BetterStaminaPlugin.DebugTranspilerLog($"");
+        BetterStaminaPlugin.DebugTranspilerLog($"#############################################################");
+        BetterStaminaPlugin.DebugTranspilerLog($"######## MODIFIED INSTRUCTIONS - {codes.Count} ########");
+        BetterStaminaPlugin.DebugTranspilerLog($"#############################################################");
+        BetterStaminaPlugin.DebugTranspilerLog($"");
+
+        for (var i = 0; i < codes.Count; i++)
+        {
+            CodeInstruction instr = codes[i];
+
+            BetterStaminaPlugin.DebugTranspilerLog($"{i} {instr}");
+        }
+
+        BetterStaminaPlugin.DebugTranspilerLog($"######## CheckRun_Transpiler END ########");
+        BetterStaminaPlugin.DebugTranspilerLog($"");
+
+        return codes;
+    }
+
+    public static float GetSwimmingStaminaDrain(float drainMax, float drainMin, float skillFactor, Player playerInst)
+    {
+        if (Player.m_localPlayer != null && (UnityEngine.Object)Player.m_localPlayer == (UnityEngine.Object)playerInst)
+        {
+            EasingFunctions.Function easeFunc = EasingFunctions.GetEasingFunction(EasingFunctions.Ease.EaseOutSine);
+            float interpFactor = easeFunc(BetterStaminaPlugin.swimMaxStaminaCost.Value, BetterStaminaPlugin.swimMinStaminaCost.Value, skillFactor);
+
+            if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+                BetterStaminaPlugin.DebugLog($"SwimStamina: Usage change: {Mathf.Lerp(drainMax, drainMin, skillFactor)} - {interpFactor}; skill: {playerInst.GetSkillFactor(Skills.SkillType.Swim)};");
+
+            return interpFactor;
+        }
+
+        return Mathf.Lerp(drainMax, drainMin, skillFactor);
+    }
+
+    [HarmonyPatch(typeof(Player), "OnSwiming")]
+    [HarmonyTranspiler]
+    static IEnumerable<CodeInstruction> OnSwimming_Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        BetterStaminaPlugin.DebugTranspilerLog($"######## OnSwimming_Transpiler START ########");
+        var codes = new List<CodeInstruction>(instructions);
+        for (var i = 0; i < codes.Count; i++)
+        {
+            CodeInstruction instr = codes[i];
+
+            BetterStaminaPlugin.DebugTranspilerLog($"{i} {instr}");
+
+            if (instr.opcode == OpCodes.Call)
+            {
+                String instrString = instr.ToString();
+                if (instrString.Contains("Mathf::Lerp"))
+                {
+                    int insertIndex = i;
+                    BetterStaminaPlugin.DebugTranspilerLog($">>> Deleting instruction {insertIndex} {codes[insertIndex].ToString()}:");
+                    codes.RemoveAt(i);
+
+                    BetterStaminaPlugin.DebugTranspilerLog($">>> Inserting instruction at {insertIndex}:");
+                    BetterStaminaPlugin.DebugTranspilerLog($"Old: { codes[insertIndex].ToString()}");
+                    codes.Insert(insertIndex, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(SkillPatches), "GetSwimmingStaminaDrain")));
+                    BetterStaminaPlugin.DebugTranspilerLog($"New: { codes[insertIndex].ToString()}");
+
+                    BetterStaminaPlugin.DebugTranspilerLog($">>> Inserting instruction at {insertIndex}:");
+                    BetterStaminaPlugin.DebugTranspilerLog($"Old: { codes[insertIndex].ToString()}");
+                    codes.Insert(insertIndex, new CodeInstruction(OpCodes.Ldarg_0));
+                    BetterStaminaPlugin.DebugTranspilerLog($"New: { codes[insertIndex].ToString()}");
+                    break;
+                }
+            }
+        }
+
+        BetterStaminaPlugin.DebugTranspilerLog($"");
+        BetterStaminaPlugin.DebugTranspilerLog($"#############################################################");
+        BetterStaminaPlugin.DebugTranspilerLog($"######## MODIFIED INSTRUCTIONS - {codes.Count} ########");
+        BetterStaminaPlugin.DebugTranspilerLog($"#############################################################");
+        BetterStaminaPlugin.DebugTranspilerLog($"");
+
+        for (var i = 0; i < codes.Count; i++)
+        {
+            CodeInstruction instr = codes[i];
+
+            BetterStaminaPlugin.DebugTranspilerLog($"{i} {instr}");
+        }
+
+        BetterStaminaPlugin.DebugTranspilerLog($"######## OnSwimming_Transpiler END ########");
+        BetterStaminaPlugin.DebugTranspilerLog($"");
 
         return codes;
     }
