@@ -23,13 +23,15 @@ In addition to current benefits, all skills reduce stamina cost for the correspo
 * Bows
   - [X] **33%** stamina cost reduction based on skill for holding the bow drawn
 * Swimming
-  - [ ] Change the interpolation type for stamina reduction
+  - [X] Switched for the skill level to ramp up the stamina cost reduction faster at the lower levels (using EaseOutSine interpolation now). The reduction at max level remains the same as vanilla - **60%**
 * Run
-  - [ ] Change the interpolation type for the stamina reduction
+  - [X] Switched for the skill level to ramp up the stamina cost reduction faster at the lower levels (using EaseOutSine interpolation now). The reduction at max level remeains the same as on vanilla - **50%**
 
 ## Conflicts
 * This mod replaces `Attack.GetStaminaUsage()` function.
 * This mod uses Harmony transpiler patch to edit `Player.PlayerAttackInput()`.
+* This mod uses Harmony transpiler patch to edit `Player.CheckRun()`.
+* This mod uses Harmony transpiler patch to edit `Player.OnSwiming()`.
 
 # Wet & Cold
 Changes health regeneration rates for **Wet** and **Cold** status effects to **-10%** and **-20%** respectively (original values are -25% and -50% respectively)
