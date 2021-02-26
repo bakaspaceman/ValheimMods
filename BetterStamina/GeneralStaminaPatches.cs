@@ -8,7 +8,7 @@ internal static class GeneralStaminaPatches
 
     private static void UpdateEncumberedStaminaDrain(Player __instance)
     {
-        if (!BetterStaminaPlugin.enableEncumberedStaminaDrain.Value)
+        if (BetterStaminaPlugin.removeEncumberedStaminaDrain.Value)
         {
             if (defaultEncumberedStaminaDrain == 0f)
             {
@@ -46,7 +46,7 @@ internal static class DebugStaminaPatches
     [HarmonyPostfix]
     private static void UseStamina_Postfix(Player __instance, float __state, ref float ___m_stamina)
     {
-        if (BetterStaminaPlugin.enableStaminaLogging.Value && (___m_stamina - __state) != 0f)
+        if (BetterStaminaPlugin.enableStaminaLogging != null && BetterStaminaPlugin.enableStaminaLogging.Value && (___m_stamina - __state) != 0f)
         {
             BetterStaminaPlugin.DebugLog($"UseStamina(): source - {new StackFrame(2).GetMethod().Name}; change - {___m_stamina - __state}");
         }
@@ -66,7 +66,7 @@ internal static class DebugStaminaPatches
         if (__state != staminaRegen && previousStaminaRate != staminaRegen)
         {
             previousStaminaRate = staminaRegen;
-            if (BetterStaminaPlugin.enableStaminaRegenLogging.Value)
+            if (BetterStaminaPlugin.enableStaminaRegenLogging != null && BetterStaminaPlugin.enableStaminaRegenLogging.Value)
             {
                 BetterStaminaPlugin.DebugLog($"ModifyStaminaRegen(): source - {__instance.m_name}; new regen - {staminaRegen}; previous - {__state} multiplier - {__instance.m_staminaRegenMultiplier}");
             }

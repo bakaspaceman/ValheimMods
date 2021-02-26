@@ -21,9 +21,9 @@ public class BepInPluginTempalte : BaseUnityPlugin
 
     public static void DebugLog(object message, bool transpilerlogs = false)
     {
-        if (enableLogging.Value)
+        if (enableLogging != null && enableLogging.Value)
         {
-            if (transpilerlogs && !enableTranspilerLogging.Value)
+            if (transpilerlogs && enableTranspilerLogging != null && !enableTranspilerLogging.Value)
                 return;
 
             Logger.LogInfo(message);
@@ -38,8 +38,10 @@ public class BepInPluginTempalte : BaseUnityPlugin
 
         harmonyInst = new Harmony(BepInAttr.GUID);
 
+#if DEBUG
         enableLogging = Config.Bind("Debug", "Logging", false, "");
         enableTranspilerLogging = Config.Bind("Debug", "TranspilerLogging", false, "");
+#endif
 
         DebugLog($"Loading..");
     }

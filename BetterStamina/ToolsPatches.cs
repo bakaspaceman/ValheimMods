@@ -15,9 +15,9 @@ internal static class ToolsPatches
 
             if (callingMethodName.Contains("Repair") || callingMethodName.Contains("UpdatePlacement"))
             {
-                if (name == "$item_hammer" && !BetterStaminaPlugin.enableHammerStaminaCost.Value ||
-                    name == "$item_hoe" && !BetterStaminaPlugin.enableHoeStaminaCost.Value ||
-                    name == "$item_cultivator" && !BetterStaminaPlugin.enableCultivatorStaminaCost.Value)
+                if (name == "$item_hammer" && BetterStaminaPlugin.removeHammerStaminaCost.Value ||
+                    name == "$item_hoe" && BetterStaminaPlugin.removeHoeStaminaCost.Value ||
+                    name == "$item_cultivator" && BetterStaminaPlugin.removeCultivatorStaminaCost.Value)
                 {
                     v = 0.0f;
                 }

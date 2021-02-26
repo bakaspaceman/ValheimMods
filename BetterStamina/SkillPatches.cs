@@ -28,7 +28,7 @@ internal static class SkillPatches
 
         __instance.m_sneakStaminaDrain = __instance.m_sneakStaminaDrain * interpFactor;
 
-        if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+        if (BetterStaminaPlugin.enableSkillStaminaLogging != null && BetterStaminaPlugin.enableSkillStaminaLogging.Value)
             BetterStaminaPlugin.DebugLog($"OnSneaking: Usage change: {defaultSneakStaminaDrain} - {__instance.m_sneakStaminaDrain}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.sneakMaxSkillStaminaCost.Value, ___m_skills.GetSkillFactor(Skills.SkillType.Jump))}; Custom: {interpFactor}; skill: {___m_skills.GetSkillFactor(Skills.SkillType.Jump)};");
     }
 
@@ -56,7 +56,7 @@ internal static class SkillPatches
 
         __instance.m_jumpStaminaUsage = __instance.m_jumpStaminaUsage * interpFactor;
 
-        if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+        if (BetterStaminaPlugin.enableSkillStaminaLogging != null && BetterStaminaPlugin.enableSkillStaminaLogging.Value)
             BetterStaminaPlugin.DebugLog($"OnJump: Usage change: {defaultJumpStaminaUsage} - {__instance.m_jumpStaminaUsage}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.jumpMaxSkillStaminaCost.Value, ___m_skills.GetSkillFactor(Skills.SkillType.Jump))}; Custom: {interpFactor}; skill: {___m_skills.GetSkillFactor(Skills.SkillType.Jump)};");
     }
 
@@ -84,7 +84,7 @@ internal static class SkillPatches
 
         __instance.m_dodgeStaminaUsage = __instance.m_dodgeStaminaUsage * interpFactor;
 
-        if (BetterStaminaPlugin.enableSkillStaminaLogging.Value && 
+        if (BetterStaminaPlugin.enableSkillStaminaLogging != null && BetterStaminaPlugin.enableSkillStaminaLogging.Value && 
             (double)___m_queuedDodgeTimer > 0.0 && __instance.IsOnGround() && (!__instance.IsDead() && !__instance.InAttack()) && (!__instance.IsEncumbered() && !__instance.InDodge()))
         {
             BetterStaminaPlugin.DebugLog($"UpdateDoge: Usage change: {defaultStaminaUsage} - {__instance.m_dodgeStaminaUsage}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.dodgeMaxSkillStaminaCost.Value, ___m_skills.GetSkillFactor(Skills.SkillType.Jump))}; Custom: {interpFactor}; skill: {___m_skills.GetSkillFactor(Skills.SkillType.Jump)};");
@@ -118,7 +118,7 @@ internal static class SkillPatches
 
             __instance.m_blockStaminaDrain = __instance.m_blockStaminaDrain * interpFactor;
 
-            if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+            if (BetterStaminaPlugin.enableSkillStaminaLogging != null && BetterStaminaPlugin.enableSkillStaminaLogging.Value)
                 BetterStaminaPlugin.DebugLog($"BlockAttack: Usage change: {defaultBlockStaminaDrain} - {__instance.m_blockStaminaDrain}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.blockMaxSkillStaminaCost.Value, playerSkills.GetSkillFactor(Skills.SkillType.Blocking))}; Custom: {interpFactor}; skill: {playerSkills.GetSkillFactor(Skills.SkillType.Blocking)};");
         }
     }
@@ -155,7 +155,7 @@ internal static class SkillPatches
 
         __result = (float)(attackStamina * interpFactor);
 
-        if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+        if (BetterStaminaPlugin.enableSkillStaminaLogging != null && BetterStaminaPlugin.enableSkillStaminaLogging.Value)
         {
             string callingMethodName = new StackFrame(2).GetMethod().Name;
             if (callingMethodName.Contains("Update"))
@@ -178,7 +178,7 @@ internal static class SkillPatches
             float interpFactor = easeFunc(1f, BetterStaminaPlugin.bowMaxSkillHoldStaminaCost.Value, playerInst.GetSkillFactor(Skills.SkillType.Bows));
             float newWeaponStaminaDrain = weaponStaminaDrain * interpFactor;
 
-            if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+            if (BetterStaminaPlugin.enableSkillStaminaLogging != null && BetterStaminaPlugin.enableSkillStaminaLogging.Value)
                 BetterStaminaPlugin.DebugLog($"BowHoldStamina: Usage change: {weaponStaminaDrain} - {newWeaponStaminaDrain}; Mathf.Lerp: {Mathf.Lerp(1f, BetterStaminaPlugin.bowMaxSkillHoldStaminaCost.Value, playerInst.GetSkillFactor(Skills.SkillType.Blocking))}; Custom: {interpFactor}; skill: {playerInst.GetSkillFactor(Skills.SkillType.Bows)};");
 
             return newWeaponStaminaDrain;
@@ -265,7 +265,7 @@ internal static class SkillPatches
             EasingFunctions.Function easeFunc = EasingFunctions.GetEasingFunction(EasingFunctions.Ease.EaseOutSine);
             float interpFactor = easeFunc(drainMax, drainMin, skillFactor);
             
-            if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+            if (BetterStaminaPlugin.enableSkillStaminaLogging != null && BetterStaminaPlugin.enableSkillStaminaLogging.Value)
                 BetterStaminaPlugin.DebugLog($"RunStamina: Skill factor change: {Mathf.Lerp(1f, 0.5f, skillFactor)} - {interpFactor}");
 
             return interpFactor;
@@ -335,7 +335,7 @@ internal static class SkillPatches
             EasingFunctions.Function easeFunc = EasingFunctions.GetEasingFunction(EasingFunctions.Ease.EaseOutSine);
             float interpFactor = easeFunc(BetterStaminaPlugin.swimMaxStaminaCost.Value, BetterStaminaPlugin.swimMinStaminaCost.Value, skillFactor);
 
-            if (BetterStaminaPlugin.enableSkillStaminaLogging.Value)
+            if (BetterStaminaPlugin.enableSkillStaminaLogging != null && BetterStaminaPlugin.enableSkillStaminaLogging.Value)
                 BetterStaminaPlugin.DebugLog($"SwimStamina: Usage change: {Mathf.Lerp(drainMax, drainMin, skillFactor)} - {interpFactor}; skill: {playerInst.GetSkillFactor(Skills.SkillType.Swim)};");
 
             return interpFactor;
