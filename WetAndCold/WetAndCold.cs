@@ -32,11 +32,15 @@ namespace WetAndCold
                     {
                         case "$se_cold_name":
                             stats.m_healthRegenMultiplier = 0.8f;
+#if DEBUG
                             UnityEngine.Debug.Log($"[{Localization.instance.Localize(se.m_name)}] Updating m_healthRegenMultiplier to 0.8f");
+#endif
                             break;
                         case "$se_wet_name":
                             stats.m_healthRegenMultiplier = 0.9f;
+#if DEBUG
                             UnityEngine.Debug.Log($"[{Localization.instance.Localize(se.m_name)}] Updating m_healthRegenMultiplier to 0.9f");
+#endif
                             break;
                     }
                 }
