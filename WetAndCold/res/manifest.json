@@ -1,7 +1,7 @@
 {
   "name": "Wet_And_Cold",
   "description": "Reduces health regeneration penalty that Wet and Cold status effects apply.",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "https://github.com/bakaspaceman/ValheimMods",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.603"

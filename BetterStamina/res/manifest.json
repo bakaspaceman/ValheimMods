@@ -1,7 +1,7 @@
 {
   "name": "Better_Stamina",
   "description": "Rebalances stamina system to make it more forgiving and improve the combat flow.",
-  "version_number": "1.0.0",
+  "version_number": "1.1.0",
   "website_url": "https://github.com/bakaspaceman/ValheimMods",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.603"
