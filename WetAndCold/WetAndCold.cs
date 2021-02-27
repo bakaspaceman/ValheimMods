@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace WetAndCold
 {
-    [BepInPlugin("bakaSpaceman.WetAndCold", "Wet & Cold", "1.0.0.0")]
+    [BepInPlugin("bakaSpaceman.WetAndCold", "Wet & Cold", "1.0.1.0")]
     public class WetAndCold : BaseUnityPlugin
     {
         static public ConfigEntry<int> nexusID;
