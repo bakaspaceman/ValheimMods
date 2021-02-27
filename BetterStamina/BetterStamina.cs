@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace BetterStamina
 {
-    [BepInPlugin("bakaSpaceman.BetterStamina", "Better Stamina", "1.0.0.0")]
+    [BepInPlugin("bakaSpaceman.BetterStamina", "Better Stamina", "1.1.0.0")]
     public class BetterStaminaPlugin : BepInPluginTempalte
     {
         // Config - Debug
