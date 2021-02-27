@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
 
@@ -7,8 +8,12 @@ namespace WetAndCold
     [BepInPlugin("bakaSpaceman.WetAndCold", "Wet & Cold", "1.0.0.0")]
     public class WetAndCold : BaseUnityPlugin
     {
+        static public ConfigEntry<int> nexusID;
+
         void Awake()
         {
+            nexusID = Config.Bind("General", "NexusID", 157, "Nexus mod ID for updates");
+
             Harmony.CreateAndPatchAll(typeof(WetAndCold));
 
             GameObject gameMainObj = GameObject.Find("_GameMain");

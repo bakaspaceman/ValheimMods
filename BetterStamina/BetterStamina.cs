@@ -14,9 +14,11 @@ namespace BetterStamina
         static public ConfigEntry<bool> enableStaminaRegenLogging;
         static public ConfigEntry<bool> enableSkillStaminaLogging;
 
-        // Config - Stamina
+        // Config - General
+        static public ConfigEntry<int> nexusID;
         static public ConfigEntry<bool> removeEncumberedStaminaDrain;
         static public ConfigEntry<float> staminaRegenRateMultiplier;
+        static public ConfigEntry<float> staminaRegenDelay;
 
         // Config - Tools
         static public ConfigEntry<bool> removeHammerStaminaCost;
@@ -38,12 +40,14 @@ namespace BetterStamina
 
         private void SetupConfig()
         {
-            staminaRegenRateMultiplier =        Config.Bind("General",      "StaminaRegenRateModifier",     1.2f, "1 - Default rate, 1.5 - 50% faster rate, 0.5 - 50% slower, etc.");
-            removeEncumberedStaminaDrain =      Config.Bind("General",      "RemoveEncumberedStaminaDrain", true, "Prevents stamina drain while encumbered.");
+            nexusID =                           Config.Bind("General",      "NexusID",                      153,    "Nexus mod ID for updates");
+            staminaRegenRateMultiplier =        Config.Bind("General",      "StaminaRegenRateModifier",     1.2f,   "1 - Default rate, 1.5 - 50% faster rate, 0.5 - 50% slower, etc.");
+            staminaRegenDelay =                 Config.Bind("General",      "StaminaRegenDelay",            1f,     "Time in seconds before stamina starts regenerating. Default value - 1.");
+            removeEncumberedStaminaDrain =      Config.Bind("General",      "RemoveEncumberedStaminaDrain", true,   "Prevents stamina drain while encumbered.");
 
-            removeHammerStaminaCost =           Config.Bind("Tools",        "RemoveHammerStaminaCost",      true, "Repairing and constructing items will not consume stamina.");
-            removeHoeStaminaCost =              Config.Bind("Tools",        "RemoveHoeStaminaCost",         true, "Using hoe will not consume stamina.");
-            removeCultivatorStaminaCost =       Config.Bind("Tools",        "RemoveCultivatorStaminaCost",  true, "Using cultivator will not consume stamina.");
+            removeHammerStaminaCost =           Config.Bind("Tools",        "RemoveHammerStaminaCost",      true,   "Repairing and constructing items will not consume stamina.");
+            removeHoeStaminaCost =              Config.Bind("Tools",        "RemoveHoeStaminaCost",         true,   "Using hoe will not consume stamina.");
+            removeCultivatorStaminaCost =       Config.Bind("Tools",        "RemoveCultivatorStaminaCost",  true,   "Using cultivator will not consume stamina.");
 
             dodgeMaxSkillStaminaCost =          Config.Bind("Skills",       "DodgeCostAtMaxSkill",          0.67f,  "The value is a percentage modifier of the default cost. 1 - default cost, < 1 - reduced cost, > 1 - increased");
             jumpMaxSkillStaminaCost =           Config.Bind("Skills",       "JumpCostAtMaxSkill",           0.67f,  "The value is a percentage modifier of the default cost. 1 - default cost, < 1 - reduced cost, > 1 - increased");

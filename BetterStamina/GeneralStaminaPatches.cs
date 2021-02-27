@@ -31,6 +31,7 @@ internal static class GeneralStaminaPatches
         UpdateEncumberedStaminaDrain(__instance);
 
         __instance.m_staminaRegenTimeMultiplier = BetterStaminaPlugin.staminaRegenRateMultiplier.Value;
+        __instance.m_staminaRegenDelay = BetterStaminaPlugin.staminaRegenDelay.Value;
     }
 }
 
