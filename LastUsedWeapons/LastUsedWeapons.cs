@@ -3,6 +3,7 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using UnityEngine;
 
@@ -14,25 +15,28 @@ namespace LastUsedWeapons
         // Config - General
         private ConfigEntry<KeyboardShortcut> toggleLastEquippedShortcut;
         static public ConfigEntry<bool> ignoreTools;
+        static public ConfigEntry<bool> autoEquipAfterSwimming;
 
         static MethodInfo _toggleEquipedMethod = typeof(Humanoid).GetMethod("ToggleEquiped", BindingFlags.Instance | BindingFlags.NonPublic);
 
-        static FieldInfo _hiddenRightItem = typeof(Humanoid).GetField("m_hiddenRightItem", BindingFlags.Instance | BindingFlags.NonPublic);
-        static FieldInfo _hiddenLeftItem = typeof(Humanoid).GetField("m_hiddenLeftItem", BindingFlags.Instance | BindingFlags.NonPublic);
-        static FieldInfo _rightItem = typeof(Humanoid).GetField("m_rightItem", BindingFlags.Instance | BindingFlags.NonPublic);
-        static FieldInfo _leftItem = typeof(Humanoid).GetField("m_leftItem", BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo _hiddenRightItemField = typeof(Humanoid).GetField("m_hiddenRightItem", BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo _hiddenLeftItemField = typeof(Humanoid).GetField("m_hiddenLeftItem", BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo _rightItemField = typeof(Humanoid).GetField("m_rightItem", BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo _leftItemField = typeof(Humanoid).GetField("m_leftItem", BindingFlags.Instance | BindingFlags.NonPublic);
 
         static ItemDrop.ItemData _lastRightItem = null;
         static ItemDrop.ItemData _lastLeftItem = null;
-        static ItemDrop.ItemData _tempLastRightItem = null;
-        static ItemDrop.ItemData _tempLastLeftItem = null;
+        static ItemDrop.ItemData _equippedRightItem = null;
+        static ItemDrop.ItemData _equippedLeftItem = null;
 
         static bool _cacheLastitems = true;
+        static bool _hiddenItemsForSwimming = false;
 
         private void SetupConfig()
         {
             toggleLastEquippedShortcut = Config.Bind("Key Bindings", "ToggleRecentWeapons", new KeyboardShortcut(KeyCode.Y), "Equips previous set of weapons");
             ignoreTools = Config.Bind("General", "IgnoreTools", false, "Will not remember tools as being last equipped (will preserve weapons held before them)");
+            autoEquipAfterSwimming = Config.Bind("General", "AutoEquipOnLeavingWater", true, "Will automatically restore weapons that were unequipped on entering water");
         }
 
         protected override void Awake()
@@ -50,12 +54,70 @@ namespace LastUsedWeapons
             {
                 ToggleLastEquippedItems();
             }
+
+            if (autoEquipAfterSwimming.Value && Player.m_localPlayer != null && (!Player.m_localPlayer.IsSwiming() || Player.m_localPlayer.IsOnGround()))
+            {
+                if (_hiddenItemsForSwimming)
+                {
+                    Player.m_localPlayer.ShowHandItems();
+                }
+
+                _hiddenItemsForSwimming = false;
+            }
+        }
+
+        private static void SetLastRightItem(ItemDrop.ItemData newRightItem)
+        {
+            string callingMethodName = new StackFrame(1).GetMethod().Name;
+
+            _lastRightItem = newRightItem;
+            if (_lastRightItem != null)
+            {
+                DebugLog($"SetLastRightItem: ({callingMethodName}) set - {_lastRightItem.m_shared.m_name}, type - {_lastRightItem.m_shared.m_itemType}");
+            }
+            else
+            {
+                DebugLog($"SetLastRightItem: ({callingMethodName}) set to empty.");
+            }
+
+            if (_lastRightItem != null && _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.TwoHandedWeapon ||
+                _lastRightItem != null && _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool ||
+                _lastLeftItem != null && _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Bow)
+            {
+                _lastLeftItem = null;
+                DebugLog($"SetLastRightItem: ({callingMethodName}) last LEFT set to empty.");
+            }
+        }
+
+        private static void SetLastLeftItem(ItemDrop.ItemData newLeftItem)
+        {
+            string callingMethodName = new StackFrame(1).GetMethod().Name;
+
+            _lastLeftItem = newLeftItem;
+            if (_lastLeftItem != null)
+            {
+                DebugLog($"SetLastLeftItem: ({callingMethodName}) set - {_lastLeftItem.m_shared.m_name}, type - {_lastLeftItem.m_shared.m_itemType}");
+            }
+            else
+            {
+                DebugLog($"SetLastLeftItem: ({callingMethodName}) set to empty.");
+            }
+
+            if (_lastLeftItem != null && _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Bow ||
+                _lastRightItem != null && (_lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.TwoHandedWeapon || _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool))
+            {
+                _lastRightItem = null;
+                DebugLog($"SetLastLeftItem: ({callingMethodName}) last RIGHT set to empty.");
+            }
         }
 
         [HarmonyPatch(typeof(Humanoid), "UnequipItem")]
         [HarmonyPrefix]
         static bool UnequipItem_Prefix(Humanoid __instance, ItemDrop.ItemData item, bool triggerEquipEffects = true)
         {
+            if (__instance != Player.m_localPlayer)
+                return true;
+
             if (!_cacheLastitems)
             {
                 return true;
@@ -65,8 +127,12 @@ namespace LastUsedWeapons
             {
                 DebugLog($"UnequipItem_Prefix: item - {item.m_shared.m_name}, type - {item.m_shared.m_itemType}");
             }
+            else
+            {
+                return true;
+            }
 
-            bool bResult = CacheCurrentlyEquippedItems(__instance, ref _tempLastRightItem, ref _tempLastLeftItem);
+            bool bResult = CacheCurrentlyEquippedItems(__instance, ref _equippedRightItem, ref _equippedLeftItem);
 
             return bResult;
         }
@@ -77,11 +143,19 @@ namespace LastUsedWeapons
         {
             if (!_cacheLastitems)
             {
-                //DebugLog("_cacheLastitems is false! early out");
                 return;
             }
 
-            if (ignoreTools.Value && item != null && item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool)
+            if (item != null && item.m_shared != null)
+            {
+                DebugLog($"UnequipItem_Postfix: item - {item.m_shared.m_name}, type - {item.m_shared.m_itemType}");
+            }
+            else
+            {
+                return;
+            }
+
+            if (ignoreTools.Value && item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool)
             {
                 DebugLog("Ignoring tools due to config option!");
                 return;
@@ -92,73 +166,89 @@ namespace LastUsedWeapons
                 return;
             }
 
-            bool bDidWork = false;
-            if (_tempLastRightItem != (ItemDrop.ItemData)_rightItem.GetValue(__instance))
+            if (_equippedRightItem != (ItemDrop.ItemData)_rightItemField.GetValue(__instance))
             {
-                _lastRightItem = _tempLastRightItem;
-                if (_lastRightItem != null)
-                {
-                    DebugLog($"UnequipItem_Postfix: last RIGHT set - {_lastRightItem.m_shared.m_name}, type - {_lastRightItem.m_shared.m_itemType}");
-                }
-                else
-                {
-                    DebugLog("UnequipItem_Postfix: las RIGHT set to empty.");
-                }
-
-                if (_lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.TwoHandedWeapon ||
-                    _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool ||
-                    _lastLeftItem != null && _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Bow)
-                {
-                    _lastLeftItem = null;
-                    DebugLog("UnequipItem_Postfix: last LEFT set to empty.");
-                }
-
-                bDidWork = true;
+                SetLastRightItem(_equippedRightItem);
             }
 
-            if (_tempLastLeftItem != (ItemDrop.ItemData)_leftItem.GetValue(__instance))
+            if (_equippedLeftItem != (ItemDrop.ItemData)_leftItemField.GetValue(__instance))
             {
-                _lastLeftItem = _tempLastLeftItem;
-                if (_lastLeftItem != null)
-                {
-                    DebugLog($"UnequipItem_Postfix: last LEFT set - {_lastLeftItem.m_shared.m_name}, type - {_lastLeftItem.m_shared.m_itemType}");
-                }
-                else
-                {
-                    DebugLog("UnequipItem_Postfix: last LEFT set to empty.");
-                }
-
-                if (_lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Bow ||
-                    _lastRightItem != null && (_lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.TwoHandedWeapon || _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool))
-                {
-                    _lastRightItem = null;
-                    DebugLog("UnequipItem_Postfix: last RIGHT set to empty.");
-                }
-
-                bDidWork = true;
+                SetLastLeftItem(_equippedLeftItem);
             }
 
-            _tempLastRightItem = null;
-            _tempLastLeftItem = null;
+            _equippedRightItem = null;
+            _equippedLeftItem = null;
+        }
 
-            if (bDidWork)
+        [HarmonyPatch(typeof(Humanoid), "EquipItem")]
+        [HarmonyPrefix]
+        static bool EquipItem_Prefix(Humanoid __instance, ItemDrop.ItemData item, bool triggerEquipEffects = true)
+        {
+            if (__instance != Player.m_localPlayer)
+                return true;
+
+            DebugLog("");
+            if (item != null && item.m_shared != null)
             {
-                DebugLog("");
+                DebugLog($"EquipItem_Prefix: item - {item.m_shared.m_name}, type - {item.m_shared.m_itemType}");
             }
+            else
+            {
+                DebugLog($"EquipItem_Prefix: item - NULL");
+                return true;
+            }
+
+            if (item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool ||
+                item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Torch ||
+                item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon ||
+                item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield ||
+                item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Bow ||
+                item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.TwoHandedWeapon)
+            {
+                ItemDrop.ItemData hiddenLeftItem = (ItemDrop.ItemData)_hiddenLeftItemField.GetValue(__instance);
+                ItemDrop.ItemData hiddenRightItem = (ItemDrop.ItemData)_hiddenRightItemField.GetValue(__instance);
+
+                if (hiddenRightItem != null)
+                {
+                    SetLastRightItem(hiddenRightItem);
+                }
+
+                if (hiddenLeftItem != null)
+                {
+                    SetLastLeftItem(hiddenLeftItem);
+                }
+            }
+
+            return true;
         }
 
         [HarmonyPatch(typeof(Humanoid), "HideHandItems")]
         [HarmonyPrefix]
-        static bool HideHandItems_Prefix()
+        static bool HideHandItems_Prefix(Humanoid __instance)
         {
+            if (__instance != Player.m_localPlayer)
+                return true;
+
+            if (__instance.IsSwiming() && !__instance.IsOnGround())
+            {
+                if ((ItemDrop.ItemData)_rightItemField.GetValue(__instance) != null ||
+                    (ItemDrop.ItemData)_leftItemField.GetValue(__instance) != null)
+                {
+                    _hiddenItemsForSwimming = true;
+                }
+            }
+
             _cacheLastitems = false;
             return true;
         }
 
         [HarmonyPatch(typeof(Humanoid), "HideHandItems")]
         [HarmonyPostfix]
-        static void HideHandItems_Postfix()
+        static void HideHandItems_Postfix(Humanoid __instance)
         {
+            if (__instance != Player.m_localPlayer)
+                return;
+
             _cacheLastitems = true;
         }
 
@@ -175,8 +265,8 @@ namespace LastUsedWeapons
             }
 
             // If player used "R" to hide weapons, then make this mod just work like hitting "R" again and unholster them
-            if ((ItemDrop.ItemData)_hiddenLeftItem.GetValue(Player.m_localPlayer) != null ||
-                (ItemDrop.ItemData)_hiddenRightItem.GetValue(Player.m_localPlayer) != null)
+            if ((ItemDrop.ItemData)_hiddenLeftItemField.GetValue(Player.m_localPlayer) != null ||
+                (ItemDrop.ItemData)_hiddenRightItemField.GetValue(Player.m_localPlayer) != null)
             {
                 if (!Player.m_localPlayer.IsSwiming() || Player.m_localPlayer.IsOnGround())
                 {
@@ -205,74 +295,92 @@ namespace LastUsedWeapons
 
             if (_lastRightItem != null)
             {
-                if (_lastLeftItem != null && _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Torch)
+                if(tempLastRightItem != null && _lastRightItem.m_shared.m_name == tempLastRightItem.m_shared.m_name)
                 {
-                    _lastLeftItem = null;
-                    DebugLog("ToggleLastEquippedItems: last LEFT set to empty because its a torch.");
+                    _lastRightItem = null;
+                    DebugLog("ToggleLastEquippedItems: last RIGHT item is same as current equipped one. Setting to empty.");
                 }
-
-                DebugLog($"Trying to equip {_lastRightItem.m_shared.m_name}({_lastRightItem.m_shared.m_itemType}) to right arm");
-
-                bool bNewItemIsTool = _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool;
-                equippedRightItem = (bool)_toggleEquipedMethod.Invoke(Player.m_localPlayer, new object[] { _lastRightItem });
-                if (equippedRightItem)
+                else
                 {
-                    if (!ignoreTools.Value || tempLastRightItem == null || tempLastRightItem.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Tool)
+                    if (_lastLeftItem != null && _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Torch)
                     {
-                        _lastRightItem = tempLastRightItem;
+                        _lastLeftItem = null;
+                        DebugLog("ToggleLastEquippedItems: last LEFT set to empty because its a torch.");
+                    }
 
-                        if (_lastRightItem != null)
+                    DebugLog($"Trying to equip {_lastRightItem.m_shared.m_name}({_lastRightItem.m_shared.m_itemType}) to right arm");
+
+                    bool bNewItemIsTool = _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool;
+                    equippedRightItem = (bool)_toggleEquipedMethod.Invoke(Player.m_localPlayer, new object[] { _lastRightItem });
+                    if (equippedRightItem)
+                    {
+                        DebugLog("Successful");
+
+                        if (!ignoreTools.Value || tempLastRightItem == null || tempLastRightItem.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Tool)
                         {
-                            DebugLog($"ToggleLastEquippedItems: last RIGHT set - {_lastRightItem.m_shared.m_name}, type - {_lastRightItem.m_shared.m_itemType}");
+                            _lastRightItem = tempLastRightItem;
+
+                            if (_lastRightItem != null)
+                            {
+                                DebugLog($"ToggleLastEquippedItems: last RIGHT set - {_lastRightItem.m_shared.m_name}, type - {_lastRightItem.m_shared.m_itemType}");
+                            }
+                            else
+                            {
+                                DebugLog("ToggleLastEquippedItems: last RIGHT set to empty.");
+                            }
                         }
-                        else
+                        else if (ignoreTools.Value && !bNewItemIsTool)
                         {
+                            _lastRightItem = null;
                             DebugLog("ToggleLastEquippedItems: last RIGHT set to empty.");
                         }
-                    }
-                    else if (ignoreTools.Value && !bNewItemIsTool)
-                    {
-                        _lastRightItem = null;
-                        DebugLog("ToggleLastEquippedItems: last RIGHT set to empty.");
                     }
                 }
             }
 
             if (_lastLeftItem != null)
             {
-                DebugLog($"Trying to equip {_lastLeftItem.m_shared.m_name}({_lastLeftItem.m_shared.m_itemType}) to left arm");
-
-                bool bNewItemIsTool = _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool;
-                if (equippedRightItem)
+                if (tempLastLeftItem != null && _lastLeftItem.m_shared.m_name == tempLastLeftItem.m_shared.m_name)
                 {
-                    equippedLeftItem = Player.m_localPlayer.EquipItem(_lastLeftItem);
+                    _lastLeftItem = null;
+                    DebugLog("ToggleLastEquippedItems: last LEFT item is same as current equipped one. Setting to empty.");
                 }
                 else
                 {
-                    equippedLeftItem = (bool)_toggleEquipedMethod.Invoke(Player.m_localPlayer, new object[] { _lastLeftItem });
-                }
+                    DebugLog($"Trying to equip {_lastLeftItem.m_shared.m_name}({_lastLeftItem.m_shared.m_itemType}) to left arm");
 
-                if (equippedLeftItem)
-                {
-                    DebugLog("Successful");
-
-                    if (!ignoreTools.Value || tempLastLeftItem == null || tempLastLeftItem.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Tool)
+                    bool bNewItemIsTool = _lastLeftItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool;
+                    if (equippedRightItem)
                     {
-                        _lastLeftItem = tempLastLeftItem;
+                        equippedLeftItem = Player.m_localPlayer.EquipItem(_lastLeftItem);
+                    }
+                    else
+                    {
+                        equippedLeftItem = (bool)_toggleEquipedMethod.Invoke(Player.m_localPlayer, new object[] { _lastLeftItem });
+                    }
 
-                        if (_lastLeftItem != null)
+                    if (equippedLeftItem)
+                    {
+                        DebugLog("Successful");
+
+                        if (!ignoreTools.Value || tempLastLeftItem == null || tempLastLeftItem.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Tool)
                         {
-                            DebugLog($"ToggleLastEquippedItems: last LEFT set - {_lastLeftItem.m_shared.m_name}, type - {_lastLeftItem.m_shared.m_itemType}");
+                            _lastLeftItem = tempLastLeftItem;
+
+                            if (_lastLeftItem != null)
+                            {
+                                DebugLog($"ToggleLastEquippedItems: last LEFT set - {_lastLeftItem.m_shared.m_name}, type - {_lastLeftItem.m_shared.m_itemType}");
+                            }
+                            else
+                            {
+                                DebugLog("ToggleLastEquippedItems: last LEFT set to empty.");
+                            }
                         }
-                        else
+                        else if (ignoreTools.Value && !bNewItemIsTool)
                         {
+                            _lastLeftItem = null;
                             DebugLog("ToggleLastEquippedItems: last LEFT set to empty.");
                         }
-                    }
-                    else if (ignoreTools.Value && !bNewItemIsTool)
-                    {
-                        _lastLeftItem = null;
-                        DebugLog("ToggleLastEquippedItems: last LEFT set to empty.");
                     }
                 }
             }
@@ -287,28 +395,28 @@ namespace LastUsedWeapons
             DebugLog("");
         }
 
-        private static bool CacheCurrentlyEquippedItems(Humanoid __instance, ref ItemDrop.ItemData lastRightItem, ref ItemDrop.ItemData lastLeftItem)
+        private static bool CacheCurrentlyEquippedItems(Humanoid __instance, ref ItemDrop.ItemData rightItem, ref ItemDrop.ItemData leftItem)
         {
             if (Player.m_localPlayer != __instance || __instance == null)
             {
                 return true;
             }
 
-            if (_rightItem != null)
+            if (_rightItemField != null)
             {
-                lastRightItem = (ItemDrop.ItemData)_rightItem.GetValue(__instance);
-                if (lastRightItem != null && lastRightItem.m_shared != null)
+                rightItem = (ItemDrop.ItemData)_rightItemField.GetValue(__instance);
+                if (rightItem != null && rightItem.m_shared != null)
                 {
-                    DebugLog($"Caching currently equipped RIGHT item - {lastRightItem.m_shared.m_name}, type - {lastRightItem.m_shared.m_itemType}");
+                    DebugLog($"Currently equipped RIGHT item - {rightItem.m_shared.m_name}, type - {rightItem.m_shared.m_itemType}");
                 }
             }
 
-            if (_leftItem != null)
+            if (_leftItemField != null)
             {
-                lastLeftItem = (ItemDrop.ItemData)_leftItem.GetValue(__instance);
-                if (lastLeftItem != null && lastLeftItem.m_shared != null)
+                leftItem = (ItemDrop.ItemData)_leftItemField.GetValue(__instance);
+                if (leftItem != null && leftItem.m_shared != null)
                 {
-                    DebugLog($"Caching currently equipped LEFT item - {lastLeftItem.m_shared.m_name}, type - {lastLeftItem.m_shared.m_itemType}");
+                    DebugLog($"Currently equipped LEFT item - {leftItem.m_shared.m_name}, type - {leftItem.m_shared.m_itemType}");
                 }
             }
 
