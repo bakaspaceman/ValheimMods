@@ -34,6 +34,10 @@
     <Reference Include="0Harmony">
       <HintPath>..\..\_Libs\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="assembly_guiutils, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\_Libs\assembly_guiutils.dll</HintPath>
+    </Reference>
     <Reference Include="assembly_valheim">
       <HintPath>..\..\_Libs\assembly_valheim.dll</HintPath>
     </Reference>
@@ -60,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BetterStamina.cs" />
+    <Compile Include="StatusEffectPatches.cs" />
     <Compile Include="SkillPatches.cs" />
     <Compile Include="GeneralStaminaPatches.cs" />
     <Compile Include="ToolsPatches.cs" />

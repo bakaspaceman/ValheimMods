@@ -260,13 +260,18 @@ internal static class SkillPatches
 
     public static float GetRunStaminaSkillFactor(float drainMax, float drainMin, float skillFactor, Player playerInst)
     {
+        drainMin = BetterStaminaPlugin.runMaxSkillStaminaCost.Value;
+
         if (Player.m_localPlayer != null && (UnityEngine.Object)Player.m_localPlayer == (UnityEngine.Object)playerInst)
         {
+            if (playerInst.GetCurrentWeapon() != null)
+                drainMin = BetterStaminaPlugin.runWithWeapMaxSkillStaminaCost.Value;
+
             EasingFunctions.Function easeFunc = EasingFunctions.GetEasingFunction(EasingFunctions.Ease.EaseOutSine);
             float interpFactor = easeFunc(drainMax, drainMin, skillFactor);
             
             if (BetterStaminaPlugin.enableSkillStaminaLogging != null && BetterStaminaPlugin.enableSkillStaminaLogging.Value)
-                BetterStaminaPlugin.DebugLog($"RunStamina: Skill factor change: {Mathf.Lerp(1f, 0.5f, skillFactor)} - {interpFactor}");
+                BetterStaminaPlugin.DebugLog($"RunStamina: Skill factor change: {Mathf.Lerp(drainMax, drainMin, skillFactor)} - {interpFactor}");
 
             return interpFactor;
         }
