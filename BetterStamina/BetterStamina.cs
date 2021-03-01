@@ -45,6 +45,7 @@ namespace BetterStamina
 
         // Common use private fields
         static public FieldInfo playerSkillsField = typeof(Player).GetField("m_skills", BindingFlags.Instance | BindingFlags.NonPublic);
+        static public FieldInfo statusEffectsField = typeof(SEMan).GetField("m_statusEffects", BindingFlags.Instance | BindingFlags.NonPublic);
 
         private void SetupConfig()
         {
