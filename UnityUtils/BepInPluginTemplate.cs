@@ -12,6 +12,7 @@ public class BepInPluginTemplate : BaseUnityPlugin
 
     protected BepInPlugin BepInAttr { get; set; }
     static protected Harmony harmonyInst { get; set; }
+    static protected BepInPluginTemplate modInst { get; set; }
     static protected new ManualLogSource Logger { get; set; }
 
     public static void DebugTranspilerLog(object message)
@@ -32,6 +33,8 @@ public class BepInPluginTemplate : BaseUnityPlugin
 
     protected virtual void Awake()
     {
+        modInst = this;
+
         BepInAttr = (BepInPlugin)Attribute.GetCustomAttribute(GetType(), typeof(BepInPlugin));
 
         Logger = BepInEx.Logging.Logger.CreateLogSource(BepInAttr.Name);

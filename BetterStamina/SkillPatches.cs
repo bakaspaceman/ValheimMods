@@ -1,7 +1,6 @@
 ﻿using BetterStamina;
 using HarmonyLib;
 using UnityEngine;
-using MathUtils;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Reflection.Emit;
