@@ -3,11 +3,12 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using System.Reflection;
+using UnityEngine;
 
 namespace BetterStamina
 {
     [BepInPlugin("bakaSpaceman.BetterStamina", "Better Stamina", "1.2.0.0")]
-    public class BetterStaminaPlugin : BepInPluginTempalte
+    public class BetterStaminaPlugin : BepInPluginTemplate
     {
         // Config - Debug
         static public ConfigEntry<bool> enableStaminaLogging;
@@ -86,8 +87,7 @@ namespace BetterStamina
             base.Awake();
 
             SetupConfig();
-            StatusEffectPatches.OnAwake();
-
+            
             if (enableLogging != null && enableLogging.Value)
             {
                 harmonyInst.PatchAll(typeof(DebugStaminaPatches));
@@ -96,6 +96,18 @@ namespace BetterStamina
             harmonyInst.PatchAll(typeof(ToolsPatches));
             harmonyInst.PatchAll(typeof(SkillPatches));
             harmonyInst.PatchAll(typeof(StatusEffectPatches));
+            //harmonyInst.PatchAll(typeof(WeaponStatsPatches));
+
+#if DEBUG
+            // This is to refresh the values on reloading the mod with F6
+
+            ObjectDB objectDB = BepInExHelpers.FindObjectDB();
+            if (objectDB != null)
+            {
+                StatusEffectPatches.UpdateEffects(objectDB);
+                //WeaponStatsPatches.SetupConfig(objectDB);
+            }
+#endif
         }
     }
 }

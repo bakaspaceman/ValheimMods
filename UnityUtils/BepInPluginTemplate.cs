@@ -4,7 +4,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using System;
 
-public class BepInPluginTempalte : BaseUnityPlugin
+public class BepInPluginTemplate : BaseUnityPlugin
 {
     // Config - Debug
     static public ConfigEntry<bool> enableLogging;

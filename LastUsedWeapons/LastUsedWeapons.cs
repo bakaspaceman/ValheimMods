@@ -10,7 +10,7 @@ using UnityEngine;
 namespace LastUsedWeapons
 {
     [BepInPlugin("bakaSpaceman.LastUsedWeapons", "Last Used Weapons", "1.0.0.0")]
-    public class LastUsedWeapons : BepInPluginTempalte
+    public class LastUsedWeapons : BepInPluginTemplate
     {
         // Config - General
         private ConfigEntry<KeyboardShortcut> toggleLastEquippedShortcut;

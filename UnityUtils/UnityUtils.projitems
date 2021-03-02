@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BepInPluginTemplate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BepInExHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Math.cs" />
   </ItemGroup>
 </Project>

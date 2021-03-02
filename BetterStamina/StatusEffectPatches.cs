@@ -5,18 +5,6 @@ using UnityEngine;
 
 internal static class StatusEffectPatches
 {
-    public static void OnAwake()
-    {
-        GameObject gameMainObj = GameObject.Find("_GameMain");
-        if (gameMainObj != null)
-        {
-            ObjectDB objectDB = gameMainObj.GetComponent<ObjectDB>();
-            if (objectDB != null)
-            {
-                UpdateEffects(objectDB);
-            }
-        }
-    }
     private static void UpdateStatusEffect(StatusEffect se, bool onPlayer = false)
     {
         string playerString = onPlayer ? " on local player " : " in ObjectDB ";
