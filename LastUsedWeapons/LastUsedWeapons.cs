@@ -13,11 +13,13 @@ namespace LastUsedWeapons
     public class LastUsedWeapons : BepInPluginTemplate
     {
         // Config - General
+        static public ConfigEntry<int> nexusID;
         private ConfigEntry<KeyboardShortcut> toggleLastEquippedShortcut;
-        static public ConfigEntry<bool> ignoreTools;
+        //static public ConfigEntry<bool> ignoreTools;
         static public ConfigEntry<bool> autoEquipAfterSwimming;
 
         static MethodInfo _toggleEquipedMethod = typeof(Humanoid).GetMethod("ToggleEquiped", BindingFlags.Instance | BindingFlags.NonPublic);
+        static MethodInfo _takeInputMethod = typeof(Player).GetMethod("TakeInput", BindingFlags.Instance | BindingFlags.NonPublic);
 
         static FieldInfo _hiddenRightItemField = typeof(Humanoid).GetField("m_hiddenRightItem", BindingFlags.Instance | BindingFlags.NonPublic);
         static FieldInfo _hiddenLeftItemField = typeof(Humanoid).GetField("m_hiddenLeftItem", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -34,8 +36,9 @@ namespace LastUsedWeapons
 
         private void SetupConfig()
         {
-            toggleLastEquippedShortcut = Config.Bind("Key Bindings", "ToggleRecentWeapons", new KeyboardShortcut(KeyCode.Y), "Equips previous set of weapons");
-            ignoreTools = Config.Bind("General", "IgnoreTools", false, "Will not remember tools as being last equipped (will preserve weapons held before them)");
+            nexusID = Config.Bind("General", "NexusID", 259, "Nexus mod ID for updates");
+            toggleLastEquippedShortcut = Config.Bind("Key Bindings", "ToggleLastUsedWeapons", new KeyboardShortcut(KeyCode.T), "Equips previous set of weapons");
+            //ignoreTools = Config.Bind("General", "IgnoreTools", false, "Will not remember tools as being last equipped (will preserve weapons held before them)");
             autoEquipAfterSwimming = Config.Bind("General", "AutoEquipOnLeavingWater", true, "Will automatically restore weapons that were unequipped on entering water");
         }
 
@@ -50,19 +53,23 @@ namespace LastUsedWeapons
 
         void Update()
         {
-            if (Input.GetKeyDown(toggleLastEquippedShortcut.Value.MainKey))
+            if (Player.m_localPlayer != null)
             {
-                ToggleLastEquippedItems();
-            }
-
-            if (autoEquipAfterSwimming.Value && Player.m_localPlayer != null && (!Player.m_localPlayer.IsSwiming() || Player.m_localPlayer.IsOnGround()))
-            {
-                if (_hiddenItemsForSwimming)
+                bool acceptInput = (bool)_takeInputMethod.Invoke(Player.m_localPlayer, new object[] {});
+                if (acceptInput && Input.GetKeyDown(toggleLastEquippedShortcut.Value.MainKey))
                 {
-                    Player.m_localPlayer.ShowHandItems();
+                    ToggleLastEquippedItems();
                 }
 
-                _hiddenItemsForSwimming = false;
+                if (autoEquipAfterSwimming.Value && (!Player.m_localPlayer.IsSwiming() || Player.m_localPlayer.IsOnGround()))
+                {
+                    if (_hiddenItemsForSwimming)
+                    {
+                        Player.m_localPlayer.ShowHandItems();
+                    }
+
+                    _hiddenItemsForSwimming = false;
+                }
             }
         }
 
@@ -155,11 +162,11 @@ namespace LastUsedWeapons
                 return;
             }
 
-            if (ignoreTools.Value && item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool)
-            {
-                DebugLog("Ignoring tools due to config option!");
-                return;
-            }
+//             if (ignoreTools.Value && item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool)
+//             {
+//                 DebugLog("Ignoring tools due to config option!");
+//                 return;
+//             }
 
             if (Player.m_localPlayer != __instance)
             {
@@ -316,7 +323,7 @@ namespace LastUsedWeapons
                     {
                         DebugLog("Successful");
 
-                        if (!ignoreTools.Value || tempLastRightItem == null || tempLastRightItem.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Tool)
+                        if (/*!ignoreTools.Value || */tempLastRightItem == null || tempLastRightItem.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Tool)
                         {
                             _lastRightItem = tempLastRightItem;
 
@@ -329,11 +336,11 @@ namespace LastUsedWeapons
                                 DebugLog("ToggleLastEquippedItems: last RIGHT set to empty.");
                             }
                         }
-                        else if (ignoreTools.Value && !bNewItemIsTool)
-                        {
-                            _lastRightItem = null;
-                            DebugLog("ToggleLastEquippedItems: last RIGHT set to empty.");
-                        }
+//                         else if (ignoreTools.Value && !bNewItemIsTool)
+//                         {
+//                             _lastRightItem = null;
+//                             DebugLog("ToggleLastEquippedItems: last RIGHT set to empty.");
+//                         }
                     }
                 }
             }
@@ -363,7 +370,7 @@ namespace LastUsedWeapons
                     {
                         DebugLog("Successful");
 
-                        if (!ignoreTools.Value || tempLastLeftItem == null || tempLastLeftItem.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Tool)
+                        if (/*!ignoreTools.Value || */tempLastLeftItem == null || tempLastLeftItem.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Tool)
                         {
                             _lastLeftItem = tempLastLeftItem;
 
@@ -376,11 +383,11 @@ namespace LastUsedWeapons
                                 DebugLog("ToggleLastEquippedItems: last LEFT set to empty.");
                             }
                         }
-                        else if (ignoreTools.Value && !bNewItemIsTool)
-                        {
-                            _lastLeftItem = null;
-                            DebugLog("ToggleLastEquippedItems: last LEFT set to empty.");
-                        }
+//                         else if (ignoreTools.Value && !bNewItemIsTool)
+//                         {
+//                             _lastLeftItem = null;
+//                             DebugLog("ToggleLastEquippedItems: last LEFT set to empty.");
+//                         }
                     }
                 }
             }
