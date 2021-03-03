@@ -11,6 +11,13 @@ Have you ever died while adventuring in a swamp all wet and cold, which seems to
 - Decreased health regeneration penalty for **Wet** status effect to **-10%** (from -25%)
 - Decreased health regeneration penalty for **Cold** status effect to **-20%** (from -50%)
 
+## Notes
+- You can tweak the values in the config file (it will appear only after you run the game with the mod at least once): **Valheim/BepInEx/config/bakaSpaceman.WetAndCold.cfg**.
+
+- Or download [BepInEx Config Manger](https://github.com/BepInEx/BepInEx.ConfigurationManager/releases)﻿ plugin to be able to edit them in-game by pressing F1.
+
 ## Changelog
+### 1.0.2
+- Exposed health regen values to config so users can tweak them as they like
 ### 1.0.1
 - Added NexusId
