@@ -42,7 +42,7 @@ public class BepInPluginTemplate : BaseUnityPlugin
         harmonyInst = new Harmony(BepInAttr.GUID);
 
 #if DEBUG
-        enableLogging = Config.Bind("Debug", "Logging", false, "");
+        enableLogging = Config.Bind("Debug", "Logging", true, "");
         enableTranspilerLogging = Config.Bind("Debug", "TranspilerLogging", false, "");
 #endif
 

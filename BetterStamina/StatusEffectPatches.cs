@@ -23,6 +23,10 @@ internal static class StatusEffectPatches
                 case "$se_rested_name":
                     BetterStaminaPlugin.DebugLog($"[{Localization.instance.Localize(se.m_name)}] Updating m_staminaRegenMultiplier{playerString}from {stats.m_staminaRegenMultiplier} to {BetterStaminaPlugin.restedStaminaRegenMultiplier.Value}");
                     stats.m_staminaRegenMultiplier = BetterStaminaPlugin.restedStaminaRegenMultiplier.Value;
+
+                    SE_Rested ser = se as SE_Rested;
+                    BetterStaminaPlugin.DebugLog($"[{Localization.instance.Localize(se.m_name)}] Updating m_TTLPerComfortLevel{playerString}from {ser.m_TTLPerComfortLevel} to {BetterStaminaPlugin.restedDurationPerComfortLvl.Value}");
+                    ser.m_TTLPerComfortLevel = BetterStaminaPlugin.restedDurationPerComfortLvl.Value;
                     break;
             }
         }

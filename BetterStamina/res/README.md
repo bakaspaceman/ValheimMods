@@ -6,7 +6,10 @@ This mod rebalances the stamina system to make it a little bit more forgiving an
 - Place the dll file for this mod in **Valheim/BepInEx/plugins/** folder.
 
 ## General
-- Increased default stamina regeneration rate slightly.
+- Increased default stamina regeneration rate by 50%.
+- Reduced Rested status effect stamina regen rate from 100% to 50%. As is, this bonus is crucial to have, so this change is trying to make it less punishing to adventure without it. Value can be changed in the config.
+- Having weapons equipped will now reduce stamina regen rate by 10% and increase Running stamina costs by 10%. Values can be changed in the config.
+- Added config options to override Rested effects duration increase per comfort level, Wet status effects stamina regen rate and Cold satus effects stamina regen rate. These values are same as on vanilla by default, it's up to the user to adjust them if they want it. See notes section below on how to do it.
 - Added an option to override stamina regen delay time in the config. It's same as vanilla by default (1 second).
 - Being encumbered will not drain stamina, slow walking speed is bad enough.
 - Removed stamina cost for building & repairing.
@@ -47,6 +50,13 @@ The mod might have issues with any other mod that modifies stamina.
 - Or download [BepInEx Config Manger](https://github.com/BepInEx/BepInEx.ConfigurationManager/releases)﻿ plugin to be able to edit them in-game by pressing F1.
 
 ## Change Log
+### 1.2.0
+- Reduced Rested stamina regen bonus from 100% to 50% and increased base stamina regen rate by 50%, to reduce the overall impact and importance of having Rested status effect.
+- Added ability to override Cold, Wet and Rested status effect stamina regen rates via config file.
+- Added config option to override Rested bonus duration increase per comfort level. See "RestedDurationIncreasePerConfortLevel" in the config.
+- Added config option to override base stamina regen rate if player has weapons equipped. See "StaminaRegenRateModWithWeapons" in the config.
+- Added config option to override Running stamina cost reduction at max skill level. "RunCostModifierAtMaxSkill" in the config.
+- Added config option to override Running stamina cost separately if player has weapons equipped. "RunWithWeaponsCostModifierAtMaxSkill" in the config.
 ### 1.1.0
 - Added NexusID
 - Added StaminaRegenDelay variable to the config so users can change it if they want.

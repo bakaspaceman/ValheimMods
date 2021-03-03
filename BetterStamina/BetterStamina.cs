@@ -41,6 +41,7 @@ namespace BetterStamina
 
         // Config - Status Effects
         static public ConfigEntry<float> restedStaminaRegenMultiplier;
+        static public ConfigEntry<float> restedDurationPerComfortLvl;
         static public ConfigEntry<float> wetStaminaRegenMultiplier;
         static public ConfigEntry<float> coldStaminaRegenMultiplier;
 
@@ -73,6 +74,7 @@ namespace BetterStamina
 
             coldStaminaRegenMultiplier =        Config.Bind("Status Effects",   "ColdStaminaRegenModifier",         0.75f,  "Vanilla value - 0.75 (25% penalty)");
             restedStaminaRegenMultiplier =      Config.Bind("Status Effects",   "RestedStaminaRegenModifier",       1.5f,   "Vanilla value - 2 (100% bonus)");
+            restedDurationPerComfortLvl =       Config.Bind("Status Effects",   "RestedDurationIncreasePerConfortLevel", 60f,   "This amount of seconds will be added to the effects duration per comfort level. Vanilla value - 60 seconds");
             wetStaminaRegenMultiplier =         Config.Bind("Status Effects",   "WetStaminaRegenModifier",          0.85f,  "Vanilla value - 0.85 (15% penalty)");
 
 #if DEBUG
@@ -96,7 +98,6 @@ namespace BetterStamina
             harmonyInst.PatchAll(typeof(ToolsPatches));
             harmonyInst.PatchAll(typeof(SkillPatches));
             harmonyInst.PatchAll(typeof(StatusEffectPatches));
-            //harmonyInst.PatchAll(typeof(WeaponStatsPatches));
 
 #if DEBUG
             // This is to refresh the values on reloading the mod with F6
@@ -105,7 +106,6 @@ namespace BetterStamina
             if (objectDB != null)
             {
                 StatusEffectPatches.UpdateEffects(objectDB);
-                //WeaponStatsPatches.SetupConfig(objectDB);
             }
 #endif
         }
