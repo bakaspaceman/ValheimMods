@@ -3,6 +3,7 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using System;
+using System.Collections.Generic;
 
 public class BepInPluginTemplate : BaseUnityPlugin
 {
@@ -62,6 +63,22 @@ public class BepInPluginTemplate : BaseUnityPlugin
         }
     }
 
+    public static void PrintOutInstructions(List<CodeInstruction> instructions)
+    {
+        DebugTranspilerLog($"");
+        DebugTranspilerLog($"#############################################################");
+        DebugTranspilerLog($"######## MODIFIED INSTRUCTIONS - {instructions.Count} ########");
+        DebugTranspilerLog($"#############################################################");
+        DebugTranspilerLog($"");
+
+        for (var i = 0; i < instructions.Count; i++)
+        {
+            CodeInstruction instr = instructions[i];
+
+            DebugTranspilerLog($"{i} {instr}");
+        }
+    }
+
     protected virtual void Awake()
     {
         modInst = this;
@@ -73,7 +90,7 @@ public class BepInPluginTemplate : BaseUnityPlugin
         harmonyInst = new Harmony(BepInAttr.GUID);
 
 #if DEBUG
-        enableLogging = Config.Bind("Debug", "Logging", true, "");
+        enableLogging = Config.Bind("Debug", "Logging", false, "");
         enableTranspilerLogging = Config.Bind("Debug", "TranspilerLogging", false, "");
 #endif
 
