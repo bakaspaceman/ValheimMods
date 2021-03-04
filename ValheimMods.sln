@@ -13,8 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WetAndCold", "WetAndCold\We
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "UnityUtils", "UnityUtils\UnityUtils.shproj", "{E4EC132F-1A8D-45B3-BF09-78144FF68BCA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoWorkbenchRestrictions", "NoWorkbenchRestrictions\NoWorkbenchRestrictions.csproj", "{282EEC54-798D-482C-8772-596EF9A70C5C}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		UnityUtils\UnityUtils.projitems*{282eec54-798d-482c-8772-596ef9a70c5c}*SharedItemsImports = 4
 		UnityUtils\UnityUtils.projitems*{840eefbf-ed22-45a8-9db3-b7e50d11d3fa}*SharedItemsImports = 4
 		UnityUtils\UnityUtils.projitems*{c78b697c-0617-40b5-b559-88d31b5ed1a8}*SharedItemsImports = 4
 		UnityUtils\UnityUtils.projitems*{e4ec132f-1a8d-45b3-bf09-78144ff68bca}*SharedItemsImports = 13
@@ -40,6 +43,10 @@ Global
 		{71E1016A-9C8B-4494-9A25-554145562E44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71E1016A-9C8B-4494-9A25-554145562E44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71E1016A-9C8B-4494-9A25-554145562E44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{282EEC54-798D-482C-8772-596EF9A70C5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{282EEC54-798D-482C-8772-596EF9A70C5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{282EEC54-798D-482C-8772-596EF9A70C5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{282EEC54-798D-482C-8772-596EF9A70C5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
