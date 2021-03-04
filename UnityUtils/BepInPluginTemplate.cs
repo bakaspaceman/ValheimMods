@@ -15,19 +15,50 @@ public class BepInPluginTemplate : BaseUnityPlugin
     static protected BepInPluginTemplate modInst { get; set; }
     static protected new ManualLogSource Logger { get; set; }
 
-    public static void DebugTranspilerLog(object message)
-    {
-        DebugLog(message, true);
+    public enum LogMessageType
+    { 
+        LogInfo,
+        LogMessage,
+        LogDebug,
+        LogWarning,
+        LogError,
+        LogFatal
     }
 
-    public static void DebugLog(object message, bool transpilerlogs = false)
+    public static void DebugTranspilerLog(object message, LogMessageType msgType = LogMessageType.LogInfo)
+    {
+        DebugLog(message, msgType, true);
+    }
+
+    public static void DebugLog(object message, LogMessageType msgType = LogMessageType.LogInfo, bool transpilerlogs = false)
     {
         if (enableLogging != null && enableLogging.Value)
         {
             if (transpilerlogs && enableTranspilerLogging != null && !enableTranspilerLogging.Value)
                 return;
 
-            Logger.LogInfo(message);
+            switch (msgType)
+            {
+                case LogMessageType.LogMessage:
+                    Logger.LogMessage(message);
+                    break;
+                case LogMessageType.LogDebug:
+                    Logger.LogDebug(message);
+                    break;
+                case LogMessageType.LogWarning:
+                    Logger.LogWarning(message);
+                    break;
+                case LogMessageType.LogError:
+                    Logger.LogError(message);
+                    break;
+                case LogMessageType.LogFatal:
+                    Logger.LogFatal(message);
+                    break;
+                default:
+                    Logger.LogInfo(message);
+                    break;
+            }
+
         }
     }
 
