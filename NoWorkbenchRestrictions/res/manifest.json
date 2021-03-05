@@ -1,0 +1,9 @@
+{
+  "name": "No_Crafting_Station_Restrictions",
+  "description": "Removes the need to have crafting stations nearby for repairing, building and destroying structures and furniture",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/bakaspaceman/ValheimMods",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.603"
+  ]
+}

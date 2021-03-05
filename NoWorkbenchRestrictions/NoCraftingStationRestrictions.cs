@@ -1,27 +1,26 @@
-﻿
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection.Emit;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace NoWorkbenchRestrictions
+namespace NoCraftingStationRestrictions
 {
-    [BepInPlugin("bakaSpaceman.NoWorkbenchRestrictions", "No Workbench Restrictions", "1.0.0.0")]
-    public class NoWorkbenchRestrictionsMod : BepInPluginTemplate
+    [BepInPlugin("bakaSpaceman.NoCraftingStationRestrictions", "No Crafting Stations", "1.0.0.0")]
+    public class NoCraftingStationRestrictionsMod : BepInPluginTemplate
     {
         private static Dictionary<string, GameObject> prefabList = new Dictionary<string, GameObject>();
 
         //Config - General
+        static public ConfigEntry<int> nexusID;
         static public ConfigEntry<bool> hideStationInRecipies;
 
         private void SetupConfig()
         {
-            //nexusID = Config.Bind("General", "NexusID", 259, "Nexus mod ID for updates");
+            nexusID = Config.Bind("General", "NexusID", 295, "Nexus mod ID for updates");
             hideStationInRecipies = Config.Bind("General", "HideStationsInRecipeRequirements", true, "Will hide station icon in the recipe requirements UI");
         }
 
@@ -31,29 +30,13 @@ namespace NoWorkbenchRestrictions
 
             SetupConfig();
 
-            harmonyInst.PatchAll(typeof(NoWorkbenchRestrictionsMod));
-        }
-
-        [HarmonyPatch(typeof(Player), "HaveRequirements", new Type[] { typeof(Piece), typeof(Player.RequirementMode) })]
-        [HarmonyPostfix]
-        static public void HaveRequirements_Postfix(Piece piece, Player.RequirementMode mode, bool __result)
-        {
-            DebugLog($"Player.HaveRequirements_Postfix(): result - {__result}; piece - {piece.m_name}; mode - {mode}");
-        }
-        
-        [HarmonyPatch(typeof(Inventory), "CountItems")]
-        [HarmonyPostfix]
-        static public void CountItems_Postfix(String name, int __result)
-        {
-            //DebugLog($"Inventory.CountItems_Postfix(): result - {__result}; name - {name}");
+            harmonyInst.PatchAll(typeof(NoCraftingStationRestrictionsMod));
         }
 
         [HarmonyPatch(typeof(Hud), "SetupPieceInfo")]
         [HarmonyPostfix]
         static public void SetupPieceInfo_Postfix(Piece piece, GameObject[] ___m_requirementItems)
         {
-            DebugLog($"Hud.SetupPieceInfo(): name - {piece.m_name}");
-
             GameObject requirementItem = ___m_requirementItems[piece.m_resources.Length];
 
             if (hideStationInRecipies.Value)
@@ -72,7 +55,7 @@ namespace NoWorkbenchRestrictions
 
         static public bool HaveBuildStationsInRange(string name, Vector3 point)
         {
-            DebugLog($"NoWorkbenchRestrictionsMod.HaveBuildStationsInRange(): true; name - {name}; point - {point.ToString()}");
+            //DebugLog($"NoCraftingStationRestrictions.HaveBuildStationsInRange(): true; name - {name}; point - {point.ToString()}");
             return true;
         }
 
@@ -124,9 +107,13 @@ namespace NoWorkbenchRestrictions
 
                             DebugTranspilerLog($">>> Inserting instruction at {insertIndex}:");
                             DebugTranspilerLog($"Old: { codes[insertIndex].ToString()}");
-                            codes.Insert(insertIndex, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NoWorkbenchRestrictionsMod), "HaveBuildStationsInRange")));
+                            codes.Insert(insertIndex, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NoCraftingStationRestrictionsMod), "HaveBuildStationsInRange")));
                             DebugTranspilerLog($"New: { codes[insertIndex].ToString()}");
                             break;
+                        }
+                        else
+                        {
+                            Logger.LogFatal($">>> FAILED to find targeted code in Player.CheckCanRemovePiece() for a transpuiler patch!!! The mod will not work!");
                         }
                     }
                 }
@@ -188,9 +175,13 @@ namespace NoWorkbenchRestrictions
 
                             DebugTranspilerLog($">>> Inserting instruction at {insertIndex}:");
                             DebugTranspilerLog($"Old: { codes[insertIndex].ToString()}");
-                            codes.Insert(insertIndex, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NoWorkbenchRestrictionsMod), "HaveBuildStationsInRange")));
+                            codes.Insert(insertIndex, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NoCraftingStationRestrictionsMod), "HaveBuildStationsInRange")));
                             DebugTranspilerLog($"New: { codes[insertIndex].ToString()}");
                             break;
+                        }
+                        else
+                        {
+                            Logger.LogFatal($">>> FAILED to find targeted code in Player.HaveRequirements() for a transpuiler patch!!! The mod will not work!");
                         }
                     }
                 }

@@ -7,8 +7,8 @@
     <ProjectGuid>{282EEC54-798D-482C-8772-596EF9A70C5C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NoWorkbenchRestrictions</RootNamespace>
-    <AssemblyName>NoWorkbenchRestrictions</AssemblyName>
+    <RootNamespace>NoCraftingStationRestrictions</RootNamespace>
+    <AssemblyName>NoCraftingStationRestrictions</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -63,7 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NoWorkbenchRestrictions.cs" />
+    <Compile Include="NoCraftingStationRestrictions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="..\UnityUtils\UnityUtils.projitems" Label="Shared" />

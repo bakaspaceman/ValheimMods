@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WetAndCold", "WetAndCold\We
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "UnityUtils", "UnityUtils\UnityUtils.shproj", "{E4EC132F-1A8D-45B3-BF09-78144FF68BCA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoWorkbenchRestrictions", "NoWorkbenchRestrictions\NoWorkbenchRestrictions.csproj", "{282EEC54-798D-482C-8772-596EF9A70C5C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoCraftingStationRestrictions", "NoWorkbenchRestrictions\NoCraftingStationRestrictions.csproj", "{282EEC54-798D-482C-8772-596EF9A70C5C}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
