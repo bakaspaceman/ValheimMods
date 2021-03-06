@@ -1,7 +1,7 @@
 {
   "name": "Last_Used_Weapons",
   "description": "Adds new shortcut to equip items you last held in your hands. Think 'Q' in CS.",
-  "version_number": "1.0.0",
+  "version_number": "1.1.0",
   "website_url": "https://github.com/bakaspaceman/ValheimMods",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.603"

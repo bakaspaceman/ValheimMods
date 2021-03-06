@@ -15,3 +15,7 @@ Adds new shortcut to equip items you last held in your hands. Think 'Q' in CS. A
 - You can rebind the key in the config file (it will appear only after you run the game with the mod at least once): **Valheim/BepInEx/config/bakaSpaceman.LastUsedWeapons.cfg**.
 
 - Or download [BepInEx Config Manger](https://github.com/BepInEx/BepInEx.ConfigurationManager/releases)﻿ plugin to be able to edit them in-game by pressing F1.
+
+## Changelog
+### 1.1.0
+- Fixed a bug with not properly switching between tools
