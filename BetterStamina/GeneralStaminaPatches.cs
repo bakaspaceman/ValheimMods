@@ -30,11 +30,11 @@ internal static class GeneralStaminaPatches
         float num1 = 1f;
         if (__instance.IsBlocking())
             num1 *= 0.8f;
-        if (((__instance.IsSwiming() && !__instance.IsOnGround() || (__instance.InAttack() || __instance.InDodge()) ? 1 : (___m_wallRunning ? 1 : 0)) | (__instance.IsEncumbered() ? 1 : 0)) != 0)
+        if (((__instance.IsSwimming() && !__instance.IsOnGround() || (__instance.InAttack() || __instance.InDodge()) ? 1 : (___m_wallRunning ? 1 : 0)) | (__instance.IsEncumbered() ? 1 : 0)) != 0)
             num1 = 0.0f;
 
         float maxStamina = __instance.GetMaxStamina();
-        float missingStaminaMod = (float)(1.0 - (double)___m_stamina / (double)maxStamina);
+        float missingStaminaMod = (float)(1.0 - ___m_stamina / (double)maxStamina);
         float num2 = (___m_staminaRegen + missingStaminaMod * ___m_staminaRegen * __instance.m_staminaRegenTimeMultiplier) * num1;
         float staminaMultiplier = 1f;
         ___m_seman.ModifyStaminaRegen(ref staminaMultiplier);
@@ -42,13 +42,13 @@ internal static class GeneralStaminaPatches
         ___m_staminaRegenTimer -= dt;
 
         float returnStamina = ___m_stamina;
-        if ((double)___m_stamina < (double)maxStamina && (double)___m_staminaRegenTimer <= 0.0)
+        if (___m_stamina < (double)maxStamina && ___m_staminaRegenTimer <= 0.0)
             returnStamina = Mathf.Min(maxStamina, ___m_stamina + num3 * dt);
 
         float staminaChange = returnStamina - ___m_stamina;
         if (Mathf.Abs(staminaChange) > 0f)
         {
-            BetterStaminaPlugin.DebugLog($"StaminaChangeThisFrame: {num3}(dt-{staminaChange}), base regen - {___m_staminaRegen}; activity mult - {num1}; base mult - {__instance.m_staminaRegenTimeMultiplier}; missing mult - {missingStaminaMod}; SE mult - {staminaMultiplier}");
+            BepInPluginTemplate.DebugLog($"StaminaChangeThisFrame: {num3}(dt-{staminaChange}), base regen - {___m_staminaRegen}; activity mult - {num1}; base mult - {__instance.m_staminaRegenTimeMultiplier}; missing mult - {missingStaminaMod}; SE mult - {staminaMultiplier}");
         }
 
         return returnStamina;
@@ -65,7 +65,7 @@ internal static class GeneralStaminaPatches
 
         if (BetterStaminaPlugin.enableStaminaRegenLogging != null && BetterStaminaPlugin.enableStaminaRegenLogging.Value)
         {
-            float newStamina = CalculateNewStamina(__instance, ___m_wallRunning, ___m_staminaRegen, ___m_stamina, ___m_seman, ref ___m_staminaRegenTimer, dt);
+            CalculateNewStamina(__instance, ___m_wallRunning, ___m_staminaRegen, ___m_stamina, ___m_seman, ref ___m_staminaRegenTimer, dt);
         }
     }
 }

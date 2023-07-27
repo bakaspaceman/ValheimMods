@@ -1,13 +1,10 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
-using BepInEx.Logging;
-using HarmonyLib;
 using System.Reflection;
-using UnityEngine;
 
 namespace BetterStamina
 {
-    [BepInPlugin("bakaSpaceman.BetterStamina", "Better Stamina", "1.2.0.0")]
+  [BepInPlugin("bakaSpaceman.BetterStamina", "Better Stamina", "2.0.0")]
     public class BetterStaminaPlugin : BepInPluginTemplate
     {
         // Config - Debug

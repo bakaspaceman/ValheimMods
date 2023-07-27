@@ -1,7 +1,6 @@
 ﻿using BetterStamina;
 using HarmonyLib;
 using System.Collections.Generic;
-using UnityEngine;
 
 internal static class StatusEffectPatches
 {
