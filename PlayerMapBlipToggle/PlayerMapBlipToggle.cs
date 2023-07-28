@@ -1,10 +1,9 @@
 ﻿using BepInEx;
 using HarmonyLib;
-using System;
 
 namespace PlayerMapBlipToggle
 {
-    [BepInPlugin("bakaSpaceman.playermapbliptoggle", "Player Map Blip Toggle", "1.0.0.0")]
+  [BepInPlugin("bakaSpaceman.playermapbliptoggle", "Player Map Blip Toggle", "2.0.0")]
     public class PlayerMapBlipToggle : BaseUnityPlugin
     {
         void Awake()

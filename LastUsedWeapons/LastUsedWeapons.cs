@@ -1,15 +1,13 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
-using BepInEx.Logging;
 using HarmonyLib;
-using System;
 using System.Diagnostics;
 using System.Reflection;
 using UnityEngine;
 
 namespace LastUsedWeapons
 {
-    [BepInPlugin("bakaSpaceman.LastUsedWeapons", "Last Used Weapons", "1.1.0.0")]
+    [BepInPlugin("bakaSpaceman.LastUsedWeapons", "Last Used Weapons", "2.0.1")]
     public class LastUsedWeapons : BepInPluginTemplate
     {
         // Config - General
@@ -17,13 +15,13 @@ namespace LastUsedWeapons
         private ConfigEntry<KeyboardShortcut> toggleLastEquippedShortcut;
         static public ConfigEntry<bool> autoEquipAfterSwimming;
 
-        static MethodInfo _toggleEquipedMethod = typeof(Humanoid).GetMethod("ToggleEquiped", BindingFlags.Instance | BindingFlags.NonPublic);
-        static MethodInfo _takeInputMethod = typeof(Player).GetMethod("TakeInput", BindingFlags.Instance | BindingFlags.NonPublic);
+        static MethodInfo _toggleEquipedMethod = typeof(Humanoid).GetMethod(nameof(Humanoid.ToggleEquipped), BindingFlags.Instance | BindingFlags.NonPublic);
+        static MethodInfo _takeInputMethod = typeof(Player).GetMethod(nameof(Player.TakeInput), BindingFlags.Instance | BindingFlags.NonPublic);
 
-        static FieldInfo _hiddenRightItemField = typeof(Humanoid).GetField("m_hiddenRightItem", BindingFlags.Instance | BindingFlags.NonPublic);
-        static FieldInfo _hiddenLeftItemField = typeof(Humanoid).GetField("m_hiddenLeftItem", BindingFlags.Instance | BindingFlags.NonPublic);
-        static FieldInfo _rightItemField = typeof(Humanoid).GetField("m_rightItem", BindingFlags.Instance | BindingFlags.NonPublic);
-        static FieldInfo _leftItemField = typeof(Humanoid).GetField("m_leftItem", BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo _hiddenRightItemField = typeof(Humanoid).GetField(nameof(Humanoid.m_hiddenRightItem), BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo _hiddenLeftItemField = typeof(Humanoid).GetField(nameof(Humanoid.m_hiddenLeftItem), BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo _rightItemField = typeof(Humanoid).GetField(nameof(Humanoid.m_rightItem), BindingFlags.Instance | BindingFlags.NonPublic);
+        static FieldInfo _leftItemField = typeof(Humanoid).GetField(nameof(Humanoid.m_leftItem), BindingFlags.Instance | BindingFlags.NonPublic);
 
         static ItemDrop.ItemData _lastRightItem = null;
         static ItemDrop.ItemData _lastLeftItem = null;
@@ -59,7 +57,7 @@ namespace LastUsedWeapons
                     ToggleLastEquippedItems();
                 }
 
-                if (autoEquipAfterSwimming.Value && (!Player.m_localPlayer.IsSwiming() || Player.m_localPlayer.IsOnGround()))
+                if (autoEquipAfterSwimming.Value && (!Player.m_localPlayer.IsSwimming() || Player.m_localPlayer.IsOnGround()))
                 {
                     if (_hiddenItemsForSwimming)
                     {
@@ -228,7 +226,7 @@ namespace LastUsedWeapons
             if (__instance != Player.m_localPlayer)
                 return true;
 
-            if (__instance.IsSwiming() && !__instance.IsOnGround())
+            if (__instance.IsSwimming() && !__instance.IsOnGround())
             {
                 if ((ItemDrop.ItemData)_rightItemField.GetValue(__instance) != null ||
                     (ItemDrop.ItemData)_leftItemField.GetValue(__instance) != null)
@@ -267,7 +265,7 @@ namespace LastUsedWeapons
             if ((ItemDrop.ItemData)_hiddenLeftItemField.GetValue(Player.m_localPlayer) != null ||
                 (ItemDrop.ItemData)_hiddenRightItemField.GetValue(Player.m_localPlayer) != null)
             {
-                if (!Player.m_localPlayer.IsSwiming() || Player.m_localPlayer.IsOnGround())
+                if (!Player.m_localPlayer.IsSwimming() || Player.m_localPlayer.IsOnGround())
                 {
                     DebugLog("");
                     DebugLog("--- [Toggle Last Equipped] START ---");
@@ -308,7 +306,7 @@ namespace LastUsedWeapons
                     }
 
                     DebugLog($"Trying to equip {_lastRightItem.m_shared.m_name}({_lastRightItem.m_shared.m_itemType}) to right arm");
-
+                    
                     bool bNewItemIsTool = _lastRightItem.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Tool;
                     equippedRightItem = (bool)_toggleEquipedMethod.Invoke(Player.m_localPlayer, new object[] { _lastRightItem });
                     if (equippedRightItem)
@@ -316,7 +314,6 @@ namespace LastUsedWeapons
                         DebugLog("Successful");
 
                         _lastRightItem = tempLastRightItem;
-
                         if (_lastRightItem != null)
                         {
                             DebugLog($"ToggleLastEquippedItems: last RIGHT set - {_lastRightItem.m_shared.m_name}, type - {_lastRightItem.m_shared.m_itemType}");
